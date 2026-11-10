@@ -1,0 +1,1568 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Calm Life Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Public+Sans:wght@400;500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/lucide@0.462.0/dist/umd/lucide.min.js"></script>
+<style>
+  :root{
+    --bg:#FAF5EC; --bg2:#F3EBDB; --surface:#FFFDF8; --surface2:#F7F0E2;
+    --ink:#33241A; --ink2:#5C4632; --muted:#6E5942; --line:#E5D7BF; --line2:#D9C8A8;
+    --accent:#A5502A; --accent-ink:#FFFFFF; --accent-soft:#F6E3D6;
+    --good:#5F7D3A; --warn:#B07A1E; --bad:#B23A2E;
+    --shadow:0 1px 2px rgba(60,38,18,.06),0 8px 24px -12px rgba(60,38,18,.18);
+    --radius:16px; --radius-s:10px;
+    --font-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --font-display:"Newsreader",Georgia,serif;
+    --base:16px;
+    color-scheme:light;
+  }
+  html[data-mode="dark"]{
+    --bg:#20150F; --bg2:#1A110C; --surface:#2B1E16; --surface2:#33251B;
+    --ink:#F4EADA; --ink2:#DECDB4; --muted:#B49B7E; --line:#463322; --line2:#57402A;
+    --accent-soft:#3D2A1D;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 26px -12px rgba(0,0,0,.55);
+    color-scheme:dark;
+  }
+  html[data-theme="cocoa"]{ --accent:#A5502A; }
+  html[data-theme="sage"]{ --accent:#67793F; }
+  html[data-theme="apricot"]{ --accent:#C0731F; }
+  html[data-theme="lavender"]{ --accent:#7563A6; }
+  html[data-theme="ocean"]{ --accent:#38626F; }
+  html[data-theme="rosewood"]{ --accent:#9C4353; }
+  html[data-mode="dark"][data-theme="cocoa"]{ --accent:#D08054; }
+  html[data-mode="dark"][data-theme="sage"]{ --accent:#9DB473; }
+  html[data-mode="dark"][data-theme="apricot"]{ --accent:#E3A355; }
+  html[data-mode="dark"][data-theme="lavender"]{ --accent:#AC9BD6; }
+  html[data-mode="dark"][data-theme="ocean"]{ --accent:#7FA8B5; }
+  html[data-mode="dark"][data-theme="rosewood"]{ --accent:#CE7E8C; }
+  html[data-easyread="1"]{ --font-body:"Atkinson Hyperlegible","Public Sans",system-ui,sans-serif; letter-spacing:.012em; }
+  html[data-textsize="small"]{ --base:14.5px; }
+  html[data-textsize="large"]{ --base:18px; }
+
+  *{ box-sizing:border-box; }
+  html{ font-size:var(--base); }
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--font-body); line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{ font:inherit; color:inherit; background:none; border:none; cursor:pointer; }
+  input,select,textarea{ font:inherit; color:var(--ink); }
+  :focus-visible{ outline:3px solid var(--accent); outline-offset:2px; border-radius:4px; }
+  h1,h2,h3{ font-family:var(--font-display); font-weight:600; line-height:1.15; margin:0; }
+  p{ margin:0; }
+  .muted{ color:var(--muted); }
+  .small{ font-size:.82rem; }
+  .tiny{ font-size:.72rem; }
+
+  #brightnessWrap{ min-height:100dvh; background:var(--bg); }
+
+  /* ---------- Layout ---------- */
+  .layout{ display:flex; max-width:1440px; margin:0 auto; }
+  .sidebar{
+    width:248px; flex:0 0 248px; position:sticky; top:0; height:100dvh;
+    padding:22px 14px; border-right:1px solid var(--line);
+    display:flex; flex-direction:column; gap:4px; overflow-y:auto; background:var(--bg);
+  }
+  .brand{ padding:2px 10px 16px; }
+  .brand .name{ font-family:var(--font-display); font-size:1.42rem; font-weight:700; letter-spacing:.01em; }
+  .brand .sub{ font-size:.78rem; color:var(--muted); margin-top:2px; }
+  .navlabel{ font-size:.68rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); padding:14px 10px 6px; }
+  .navitem{
+    display:flex; align-items:center; gap:11px; width:100%; text-align:left;
+    padding:9px 10px; border-radius:10px; font-size:.94rem; font-weight:500; color:var(--ink2);
+  }
+  .navitem svg{ width:19px; height:19px; flex:0 0 19px; }
+  .navitem:hover{ background:var(--surface2); }
+  .navitem.active{ background:var(--accent-soft); color:var(--ink); font-weight:600; }
+  .navitem.active svg{ color:var(--accent); }
+  .navitem .badge{ margin-left:auto; background:var(--bad); color:#fff; font-size:.66rem; font-weight:700; min-width:19px; height:19px; border-radius:99px; display:grid; place-items:center; padding:0 5px; }
+  .sidefoot{ margin-top:auto; padding:12px 10px 2px; border-top:1px solid var(--line); }
+
+  main{ flex:1; min-width:0; padding:26px 30px 110px; }
+  .view{ display:none; animation:rise .28s ease both; }
+  .view.active{ display:block; }
+  @keyframes rise{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none;} }
+  html[data-calm="1"] .view{ animation:none; }
+  html[data-calm="1"] *{ transition:none !important; }
+
+  .pagehead{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:20px; }
+  .pagehead h1{ font-size:2rem; }
+  .pagehead .lede{ color:var(--muted); margin-top:4px; max-width:56ch; }
+
+  /* ---------- Cards & grids ---------- */
+  .grid{ display:grid; gap:16px; }
+  .grid.c2{ grid-template-columns:repeat(2,1fr); }
+  .grid.c3{ grid-template-columns:repeat(3,1fr); }
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px; box-shadow:var(--shadow);
+  }
+  .card h3{ font-size:1.13rem; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+  .card h3 svg{ width:19px; height:19px; color:var(--accent); }
+  .card .cardsub{ color:var(--muted); font-size:.85rem; margin-bottom:12px; }
+  .span2{ grid-column:span 2; }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:7px; padding:9px 15px; border-radius:99px;
+    background:var(--accent); color:var(--accent-ink); font-weight:600; font-size:.9rem; min-height:42px;
+  }
+  .btn svg{ width:16px; height:16px; }
+  .btn:hover{ filter:brightness(1.07); }
+  .btn.ghost{ background:var(--surface2); color:var(--ink); border:1px solid var(--line2); }
+  .btn.small{ padding:6px 12px; min-height:36px; font-size:.83rem; }
+  .btn.danger{ background:var(--bad); }
+
+  .field{ display:flex; flex-direction:column; gap:5px; margin-bottom:11px; }
+  .field label{ font-size:.8rem; font-weight:600; color:var(--ink2); }
+  .field input,.field select,.field textarea{
+    background:var(--bg); border:1px solid var(--line2); border-radius:var(--radius-s);
+    padding:9px 11px; width:100%;
+  }
+  .field textarea{ resize:vertical; min-height:64px; }
+  .formrow{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .addbar{ display:flex; gap:8px; margin-top:10px; }
+  .addbar input{ flex:1; background:var(--bg); border:1px solid var(--line2); border-radius:var(--radius-s); padding:9px 11px; min-width:0; }
+
+  /* ---------- Lists ---------- */
+  .list{ display:flex; flex-direction:column; }
+  .row{
+    display:flex; align-items:center; gap:11px; padding:10px 2px;
+    border-bottom:1px solid var(--line);
+  }
+  .row:last-child{ border-bottom:none; }
+  .row .grow{ flex:1; min-width:0; }
+  .row .title{ font-weight:600; font-size:.95rem; overflow-wrap:anywhere; }
+  .row .meta{ font-size:.8rem; color:var(--muted); }
+  .row.done .title{ text-decoration:line-through; color:var(--muted); font-weight:500; }
+  .tick{
+    width:30px; height:30px; flex:0 0 30px; border-radius:50%;
+    border:2px solid var(--line2); display:grid; place-items:center; color:transparent;
+  }
+  .tick svg{ width:15px; height:15px; }
+  .tick.on{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .iconbtn{ width:34px; height:34px; flex:0 0 34px; border-radius:9px; display:grid; place-items:center; color:var(--muted); }
+  .iconbtn:hover{ background:var(--surface2); color:var(--ink); }
+  .iconbtn svg{ width:16px; height:16px; }
+  .pill{ display:inline-flex; align-items:center; gap:5px; font-size:.72rem; font-weight:700; padding:3px 9px; border-radius:99px; background:var(--accent-soft); color:var(--ink2); white-space:nowrap; }
+  .pill.warn{ background:#F7E8C8; color:#7A5410; }
+  html[data-mode="dark"] .pill.warn{ background:#4A3A17; color:#EBCB8B; }
+  .pill.bad{ background:#F8D9D3; color:#8E2B20; }
+  html[data-mode="dark"] .pill.bad{ background:#4C241E; color:#F0AFA2; }
+  .empty{ color:var(--muted); font-size:.9rem; padding:12px 2px; }
+
+  .bar{ height:9px; border-radius:99px; background:var(--surface2); border:1px solid var(--line); overflow:hidden; }
+  .bar > i{ display:block; height:100%; background:var(--accent); border-radius:99px; }
+  .bignum{ font-family:var(--font-display); font-size:2.1rem; font-weight:700; line-height:1.05; }
+  .statgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .stat{ background:var(--surface2); border-radius:12px; padding:12px 14px; }
+  .stat .v{ font-family:var(--font-display); font-size:1.35rem; font-weight:700; }
+  .stat .k{ font-size:.75rem; color:var(--muted); font-weight:600; }
+
+  /* ---------- Sample banner ---------- */
+  .samplebar{
+    display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+    background:var(--accent-soft); border:1px solid var(--line2); border-radius:var(--radius);
+    padding:12px 16px; margin-bottom:18px;
+  }
+  .samplebar svg{ width:20px; height:20px; color:var(--accent); flex:0 0 20px; }
+  .samplebar .grow{ flex:1; min-width:220px; font-size:.9rem; }
+
+  /* ---------- Life Circle ---------- */
+  .wheelwrap{ display:flex; flex-direction:column; align-items:center; gap:6px; padding:8px 0 2px; }
+  .wheel{ position:relative; width:min(430px,86vw); aspect-ratio:1/1; }
+  .wheel .spokes{ position:absolute; inset:0; width:100%; height:100%; }
+  .wheel .center{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:31%; aspect-ratio:1/1; border-radius:50%; background:var(--accent); color:#fff;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    box-shadow:var(--shadow); text-align:center; padding:8px;
+  }
+  .wheel .center svg{ width:26px; height:26px; }
+  .wheel .center .t{ font-family:var(--font-display); font-weight:700; font-size:1.02rem; line-height:1.1; }
+  .wheel .center .s{ font-size:.64rem; opacity:.85; }
+  .wheel .node{
+    position:absolute; width:19.5%; aspect-ratio:1/1; transform:translate(-50%,-50%);
+    border-radius:50%; background:var(--surface); border:1.5px solid var(--line2);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+    box-shadow:var(--shadow); padding:4px;
+  }
+  .wheel .node:hover{ border-color:var(--accent); }
+  .wheel .node svg{ width:21px; height:21px; color:var(--accent); }
+  .wheel .node .n{ font-size:.62rem; font-weight:700; line-height:1.1; text-align:center; }
+  .wheel .node .c{ font-size:.58rem; color:var(--muted); line-height:1; }
+
+  /* Mood */
+  .moods{ display:flex; gap:8px; flex-wrap:wrap; }
+  .moodbtn{
+    flex:1; min-width:52px; padding:9px 4px; border-radius:12px; border:1.5px solid var(--line2);
+    background:var(--bg); text-align:center; font-size:.78rem; font-weight:600; color:var(--ink2);
+  }
+  .moodbtn svg{ width:20px; height:20px; display:block; margin:0 auto 3px; }
+  .moodbtn.on{ border-color:var(--accent); background:var(--accent-soft); color:var(--ink); }
+  .moodbtn.on svg{ color:var(--accent); }
+
+  /* Calendar */
+  .seg{ display:inline-flex; background:var(--surface2); border:1px solid var(--line); border-radius:99px; padding:3px; gap:2px; }
+  .seg button{ padding:7px 14px; border-radius:99px; font-weight:600; font-size:.85rem; color:var(--muted); min-height:36px; }
+  .seg button.on{ background:var(--surface); color:var(--ink); box-shadow:var(--shadow); }
+  .cal{ display:grid; grid-template-columns:repeat(7,1fr); gap:5px; }
+  .cal .dow{ font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); text-align:center; padding:4px 0; }
+  .cal .day{
+    aspect-ratio:1/1.08; border-radius:10px; border:1px solid var(--line); background:var(--bg);
+    display:flex; flex-direction:column; align-items:center; padding:5px 2px; gap:3px; font-size:.85rem; font-weight:600;
+  }
+  .cal .day.out{ opacity:.35; }
+  .cal .day.today{ border-color:var(--accent); border-width:2px; }
+  .cal .day.sel{ background:var(--accent-soft); }
+  .cal .dots{ display:flex; gap:3px; }
+  .cal .dot{ width:6px; height:6px; border-radius:50%; background:var(--accent); }
+  .cal .dot.done{ background:var(--good); }
+  .weekday{ border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--bg); }
+  .weekday.today{ border-color:var(--accent); }
+
+  /* Timer */
+  .timerface{ font-family:var(--font-display); font-size:4rem; font-weight:700; text-align:center; line-height:1; font-variant-numeric:tabular-nums; }
+  .timermodes{ display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+
+  /* Alert */
+  .alert{ display:flex; gap:11px; align-items:flex-start; background:#FBF0DA; border:1px solid #E8CF9E; color:#6B4E0E; border-radius:12px; padding:12px 14px; font-size:.9rem; }
+  .alert svg{ width:19px; height:19px; flex:0 0 19px; margin-top:1px; }
+  html[data-mode="dark"] .alert{ background:#3D3016; border-color:#6B551F; color:#EFD9A0; }
+
+  /* Settings */
+  .swatches{ display:flex; gap:10px; flex-wrap:wrap; }
+  .swatch{ width:52px; text-align:center; }
+  .swatch .dot{ width:40px; height:40px; border-radius:50%; margin:0 auto 4px; border:3px solid transparent; display:block; }
+  .swatch.on .dot{ border-color:var(--ink); }
+  .swatch .nm{ font-size:.68rem; font-weight:600; color:var(--muted); }
+  .setrow{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:13px 2px; border-bottom:1px solid var(--line); }
+  .setrow:last-child{ border-bottom:none; }
+  .setrow .grow{ flex:1; }
+  .setrow .t{ font-weight:600; font-size:.95rem; }
+  .setrow .d{ font-size:.8rem; color:var(--muted); }
+  .switch{ width:52px; height:30px; flex:0 0 52px; border-radius:99px; background:var(--line2); position:relative; transition:background .2s; }
+  .switch::after{ content:""; position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:left .2s; }
+  .switch.on{ background:var(--accent); }
+  .switch.on::after{ left:25px; }
+  input[type="range"]{ accent-color:var(--accent); width:170px; }
+
+  /* Bottom nav (mobile) */
+  .bottomnav{
+    display:none; position:fixed; left:0; right:0; bottom:0; z-index:40;
+    background:var(--surface); border-top:1px solid var(--line);
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+  }
+  .bottomnav .inner{ display:grid; grid-template-columns:repeat(5,1fr); max-width:560px; margin:0 auto; }
+  .bottomnav button{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:7px 2px; font-size:.66rem; font-weight:600; color:var(--muted); border-radius:10px; min-height:52px; justify-content:center; }
+  .bottomnav button svg{ width:21px; height:21px; }
+  .bottomnav button.active{ color:var(--accent); }
+
+  .toast{
+    position:fixed; left:50%; bottom:96px; transform:translateX(-50%) translateY(16px);
+    background:var(--ink); color:var(--bg); padding:11px 18px; border-radius:99px; font-size:.88rem; font-weight:600;
+    opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:60; max-width:88vw; text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%); }
+
+  /* Low battery: strip decoration & motion */
+  html[data-lowbattery="1"] *{ animation:none !important; transition:none !important; }
+  html[data-lowbattery="1"] .card{ box-shadow:none; }
+
+  /* Foggy day: hide the extras on Home */
+  html[data-foggy="1"] .foggyhide{ display:none !important; }
+
+  @media (max-width:1080px){
+    .grid.c3{ grid-template-columns:repeat(2,1fr); }
+    .span2{ grid-column:span 2; }
+  }
+  @media (max-width:860px){
+    .sidebar{ display:none; }
+    .bottomnav{ display:block; }
+    main{ padding:20px 16px 118px; }
+    .pagehead h1{ font-size:1.62rem; }
+    .grid.c2,.grid.c3{ grid-template-columns:1fr; }
+    .span2{ grid-column:span 1; }
+    .statgrid{ grid-template-columns:repeat(3,1fr); gap:8px; }
+    .stat .v{ font-size:1.1rem; }
+    .formrow{ grid-template-columns:1fr; }
+    .timerface{ font-size:3.2rem; }
+    .bignum{ font-size:1.8rem; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="brightnessWrap">
+  <div class="layout">
+    <aside class="sidebar" aria-label="Planner sections">
+      <div class="brand">
+        <div class="name">Calm Life Planner</div>
+        <div class="sub" id="brandDate"></div>
+      </div>
+      <button class="navitem" data-nav="home"><i data-lucide="home"></i>Home</button>
+      <div class="navlabel">Life hubs</div>
+      <div id="sideHubs"></div>
+      <div class="navlabel">App</div>
+      <button class="navitem" data-nav="settings"><i data-lucide="settings-2"></i>Settings</button>
+      <div class="sidefoot">
+        <p class="tiny muted">Your data is saved in this browser on this device only. Export a backup from Settings any time.</p>
+      </div>
+    </aside>
+
+    <main id="main">
+      <div id="sampleSlot"></div>
+      <section class="view" id="view-home"></section>
+      <section class="view" id="view-plan"></section>
+      <section class="view" id="view-money"></section>
+      <section class="view" id="view-goals"></section>
+      <section class="view" id="view-learn"></section>
+      <section class="view" id="view-explore"></section>
+      <section class="view" id="view-people"></section>
+      <section class="view" id="view-career"></section>
+      <section class="view" id="view-household"></section>
+      <section class="view" id="view-mind"></section>
+      <section class="view" id="view-wellness"></section>
+      <section class="view" id="view-settings"></section>
+    </main>
+  </div>
+
+  <nav class="bottomnav" aria-label="Main">
+    <div class="inner">
+      <button data-nav="home"><i data-lucide="home"></i>Home</button>
+      <button data-nav="plan"><i data-lucide="calendar-check"></i>Plan</button>
+      <button data-nav="money"><i data-lucide="wallet"></i>Money</button>
+      <button data-nav="goals"><i data-lucide="target"></i>Goals</button>
+      <button data-nav="settings"><i data-lucide="settings-2"></i>Settings</button>
+    </div>
+  </nav>
+  <div class="toast" id="toast" role="status"></div>
+</div>
+
+<script>
+"use strict";
+/* ================= Helpers ================= */
+var $ = function(s, r){ return (r||document).querySelector(s); };
+var $$ = function(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function pad(n){ return (n<10?"0":"")+n; }
+function dstr(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function todayStr(){ return dstr(new Date()); }
+function addDaysStr(base, n){ var d = new Date(base+"T12:00:00"); d.setDate(d.getDate()+n); return dstr(d); }
+function fmtDate(s){ if(!s) return ""; var d = new Date(s+"T12:00:00"); return d.toLocaleDateString(undefined,{weekday:"short", month:"short", day:"numeric"}); }
+function fmtDateLong(s){ var d = new Date((s||todayStr())+"T12:00:00"); return d.toLocaleDateString(undefined,{weekday:"long", month:"long", day:"numeric", year:"numeric"}); }
+function money(n){ var v = Number(n)||0; return (v<0?"-$":"$") + Math.abs(v).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}); }
+function toast(msg){ var t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove("show"); }, 2400); }
+function icons(){ if(window.lucide){ lucide.createIcons(); } }
+
+var HUBS = [
+  {id:"plan", name:"Plan", icon:"calendar-check"},
+  {id:"money", name:"Money", icon:"wallet"},
+  {id:"goals", name:"Goals", icon:"target"},
+  {id:"learn", name:"Learn", icon:"book-open"},
+  {id:"explore", name:"Explore", icon:"compass"},
+  {id:"people", name:"People", icon:"heart-handshake"},
+  {id:"career", name:"Career", icon:"briefcase"},
+  {id:"household", name:"Household", icon:"lamp"},
+  {id:"mind", name:"Mind", icon:"sparkles"},
+  {id:"wellness", name:"Wellness", icon:"leaf"}
+];
+function hubName(id){ for(var i=0;i<HUBS.length;i++) if(HUBS[i].id===id) return HUBS[i].name; return id; }
+
+/* ================= State ================= */
+var KEY = "calm-life-planner-v1";
+var AFFIRMATIONS = [
+  "I do not need a perfect day. I need a kind one, and I can start it again at any hour.",
+  "Small steps taken calmly are still steps. My pace is allowed to be my pace.",
+  "I can hold one thing at a time. The rest can wait without falling apart.",
+  "Rest is not a reward for finishing. Rest is part of how I finish.",
+  "My worth is not measured by a finished list. I am allowed to be a work in progress.",
+  "I have handled hard days before, at this exact size of tired. I can handle this one too.",
+  "Done gently is better than perfect never. I choose gentle progress today."
+];
+
+function defaultSettings(){
+  return { theme:"cocoa", mode:"system", brightness:100, textSize:"medium", easyRead:false,
+           foggy:false, calm:false, lowBattery:false, name:"Sam" };
+}
+function blankState(){
+  return { sample:false, settings:defaultSettings(), moodLog:{}, topThree:[], brainDump:[],
+    tasks:[], bills:[], accounts:[], debts:[], income:0, savingsGoal:0, noSpend:[],
+    goals:[], books:[], ideas:[], courses:[], trips:[], bookings:[], people:[], gifts:[], events:[],
+    incomeStreams:[], hustle:[], cvNotes:"", brandNotes:"", inventory:[], emergency:{contacts:"", documents:"", medical:""},
+    morning:[], evening:[], recipes:[], groceries:[], meds:[], fitness:[],
+    gratitude:[], journal:[], letter:{text:"", openDate:"", sealed:false} };
+}
+function sampleState(){
+  var t = todayStr();
+  var S = blankState();
+  S.sample = true;
+  S.income = 3850; S.savingsGoal = 300;
+  S.moodLog[t] = { mood:4, energy:3 };
+  S.topThree = [
+    {id:uid(), text:"Send the invoice to the print shop", done:true},
+    {id:uid(), text:"30-minute walk after lunch", done:false},
+    {id:uid(), text:"Call Mum back", done:false}
+  ];
+  S.brainDump = [
+    {id:uid(), text:"Gift idea for Dad — the leather notebook he liked"},
+    {id:uid(), text:"Renew the car insurance before December"},
+    {id:uid(), text:"Try the lentil soup recipe this weekend"}
+  ];
+  S.tasks = [
+    {id:uid(), title:"Reply to the landlord about the tap", date:t, time:"09:30", hub:"household", repeat:"none", done:false},
+    {id:uid(), title:"Finish the November budget review", date:t, time:"11:00", hub:"money", repeat:"monthly", done:true},
+    {id:uid(), title:"Water the plants", date:t, time:"", hub:"household", repeat:"weekly", done:false},
+    {id:uid(), title:"Dentist appointment", date:addDaysStr(t,1), time:"14:00", hub:"wellness", repeat:"none", done:false},
+    {id:uid(), title:"Submit timesheet", date:addDaysStr(t,2), time:"17:00", hub:"career", repeat:"weekly", done:false},
+    {id:uid(), title:"Book club — chapter 12 discussion", date:addDaysStr(t,3), time:"19:00", hub:"learn", repeat:"none", done:false},
+    {id:uid(), title:"Pay the electricity bill", date:addDaysStr(t,4), time:"", hub:"money", repeat:"monthly", done:false},
+    {id:uid(), title:"Plan Sara's birthday dinner", date:addDaysStr(t,6), time:"", hub:"people", repeat:"none", done:false},
+    {id:uid(), title:"Morning stretch routine", date:addDaysStr(t,-1), time:"07:00", hub:"wellness", repeat:"daily", done:true}
+  ];
+  S.bills = [
+    {id:uid(), name:"Rent", amount:1200, dueDay:1, paid:true},
+    {id:uid(), name:"Electricity", amount:86.40, dueDay:14, paid:false},
+    {id:uid(), name:"Internet", amount:59.99, dueDay:18, paid:false},
+    {id:uid(), name:"Phone", amount:45, dueDay:22, paid:false},
+    {id:uid(), name:"Gym membership", amount:39, dueDay:5, paid:true},
+    {id:uid(), name:"Car insurance", amount:132, dueDay:27, paid:false}
+  ];
+  S.accounts = [
+    {id:uid(), name:"Everyday checking", amount:2140.55, kind:"asset"},
+    {id:uid(), name:"Emergency savings", amount:6800, kind:"asset"},
+    {id:uid(), name:"Index fund", amount:12450, kind:"asset"}
+  ];
+  S.debts = [
+    {id:uid(), name:"Store credit card", balance:1840, apr:24.99, min:55},
+    {id:uid(), name:"Car loan", balance:6400, apr:7.2, min:210},
+    {id:uid(), name:"Student loan", balance:9200, apr:5.4, min:120}
+  ];
+  S.noSpend = [addDaysStr(t,-6), addDaysStr(t,-4), addDaysStr(t,-3), addDaysStr(t,-1)];
+  S.goals = [
+    {id:uid(), title:"Build a $10,000 emergency fund", hub:"money", progress:68, target:"Jun 2027", note:"$6,800 saved so far. Automatic transfer on payday is working."},
+    {id:uid(), title:"Run a 10k without stopping", hub:"wellness", progress:45, target:"Mar 2027", note:"Longest run so far: 6.2 km. Two runs a week, no heroics."},
+    {id:uid(), title:"Read 24 books this year", hub:"learn", progress:58, target:"Dec 2026", note:"14 of 24 done. One chapter with morning coffee counts."},
+    {id:uid(), title:"Launch the side shop properly", hub:"career", progress:30, target:"Feb 2027", note:"Ten listings live. Next: photograph the spring set."}
+  ];
+  S.books = [
+    {id:uid(), title:"The Midnight Library — Matt Haig", status:"Reading", progress:62},
+    {id:uid(), title:"Atomic Habits — James Clear", status:"Finished", progress:100},
+    {id:uid(), title:"Project Hail Mary — Andy Weir", status:"Want to read", progress:0}
+  ];
+  S.ideas = [
+    {id:uid(), text:"A printable 'first apartment' checklist bundle for the shop"},
+    {id:uid(), text:"Weekend pottery class — check the community centre timetable"},
+    {id:uid(), text:"Photo walk along the canal at golden hour"}
+  ];
+  S.courses = [
+    {id:uid(), name:"Bookkeeping Basics", item:"Assignment 3 — reconciliations", due:addDaysStr(t,5), grade:"A-"},
+    {id:uid(), name:"Spanish (evening class)", item:"Unit 6 quiz", due:addDaysStr(t,2), grade:"B+"}
+  ];
+  S.trips = [
+    {id:uid(), place:"Lisbon, Portugal", region:"Europe", note:"Tram 28, pastéis, a slow week in Alfama", budget:1400},
+    {id:uid(), place:"Kyoto, Japan", region:"Asia", note:"Cherry blossom season, if the savings goal lands", budget:2600},
+    {id:uid(), place:"Scottish Highlands", region:"Europe", note:"Train to Fort William, two nights, no itinerary after that", budget:650}
+  ];
+  S.bookings = [
+    {id:uid(), title:"Train to Edinburgh — return", when:addDaysStr(t,12), detail:"Departs 09:12, seat 34A. Booking ref. in email."},
+    {id:uid(), title:"Dentist — check-up", when:addDaysStr(t,1), detail:"14:00, Dr. Patel's practice on Mill Road."}
+  ];
+  S.people = [
+    {id:uid(), name:"Sara (sister)", detail:"Inner circle", last:addDaysStr(t,-2), note:"Ask about her new flat — and the housewarming date."},
+    {id:uid(), name:"Mum", detail:"Inner circle", last:addDaysStr(t,-1), note:"Sunday calls. She asked for the soup recipe."},
+    {id:uid(), name:"Dev (best friend)", detail:"Inner circle", last:addDaysStr(t,-9), note:"It's been over a week — send the podcast link."},
+    {id:uid(), name:"Auntie Rosa", detail:"Family", last:addDaysStr(t,-20), note:"Birthday next month. She loves shortbread."}
+  ];
+  S.gifts = [
+    {id:uid(), text:"Dad — leather notebook (the one from the market stall)"},
+    {id:uid(), text:"Sara — housewarming: a olive plant, not cut flowers"}
+  ];
+  S.events = [
+    {id:uid(), title:"Dinner at Sara's new flat", when:addDaysStr(t,6), detail:"Bringing dessert. Ask about nut allergies for the new flatmate."},
+    {id:uid(), title:"Neighbourhood street party", when:addDaysStr(t,15), detail:"Volunteered for the drinks table, 2–4 pm."}
+  ];
+  S.incomeStreams = [
+    {id:uid(), name:"Day job salary", amount:3100, freq:"Monthly"},
+    {id:uid(), name:"Etsy shop — LoyalDigitals", amount:480, freq:"Monthly"},
+    {id:uid(), name:"Freelance bookkeeping", amount:270, freq:"Monthly"}
+  ];
+  S.hustle = [
+    {id:uid(), text:"Photograph the spring listing set", done:false},
+    {id:uid(), text:"Reply to the two shop messages waiting", done:true},
+    {id:uid(), text:"Draft titles for the next bundle", done:false}
+  ];
+  S.cvNotes = "CV: add the bookkeeping certificate (Oct 2026). Move the shop experience above freelance — it shows range. Keep it to two pages.";
+  S.brandNotes = "Personal brand: 'Calm systems for busy brains.' Post one useful printable tip a week; no daily grind, no hustle theatre.";
+  S.inventory = [
+    {id:uid(), item:"Passports (both)", place:"Blue folder, desk drawer", qty:"2"},
+    {id:uid(), item:"Winter duvet", place:"Linen cupboard, top shelf", qty:"1"},
+    {id:uid(), item:"Tool kit", place:"Hall cupboard", qty:"1"},
+    {id:uid(), item:"Spare phone charger", place:"Kitchen drawer", qty:"2"}
+  ];
+  S.emergency = {
+    contacts:"Mum — first call. Sara — second. Building manager: office hours only, number on the fridge.",
+    documents:"Insurance papers and tenancy agreement: blue folder, desk drawer. Scans in the 'Home — important' cloud folder.",
+    medical:"Blood type O+. Allergic to penicillin. GP: Dr. Patel, Mill Road practice."
+  };
+  S.morning = [
+    {id:uid(), text:"Glass of water before the phone", done:true},
+    {id:uid(), text:"Make the bed", done:true},
+    {id:uid(), text:"Ten minutes of daylight outside", done:false},
+    {id:uid(), text:"Pick the Top Three", done:true}
+  ];
+  S.evening = [
+    {id:uid(), text:"Lay out tomorrow's clothes", done:false},
+    {id:uid(), text:"Brain dump into the planner", done:false},
+    {id:uid(), text:"Phone charges in the kitchen, not the bedroom", done:true}
+  ];
+  S.recipes = [
+    {id:uid(), name:"Tomato lentil soup", time:"35 min", ingredients:["Red lentils 250g","Tinned tomatoes x2","Onion","Garlic","Vegetable stock","Cumin"]},
+    {id:uid(), name:"Chicken & pepper stir-fry", time:"20 min", ingredients:["Chicken breast 400g","Bell peppers x3","Soy sauce","Rice 300g","Spring onions","Ginger"]}
+  ];
+  S.groceries = [
+    {id:uid(), text:"Oat milk", done:false},
+    {id:uid(), text:"Eggs (free range, 10)", done:true},
+    {id:uid(), text:"Sourdough loaf", done:false}
+  ];
+  S.meds = [
+    {id:uid(), name:"Vitamin D", dose:"1 tablet with breakfast", supply:24},
+    {id:uid(), name:"Allergy tablets", dose:"1 tablet as needed", supply:5}
+  ];
+  S.fitness = [
+    {id:uid(), date:addDaysStr(t,-1), text:"Walk — canal loop", detail:"42 min · 3.8 km"},
+    {id:uid(), date:addDaysStr(t,-3), text:"Run — easy pace", detail:"25 min · 4.1 km"},
+    {id:uid(), date:addDaysStr(t,-5), text:"Home stretch & mobility", detail:"18 min"}
+  ];
+  S.gratitude = [
+    {id:uid(), date:addDaysStr(t,-1), text:"The neighbour who took the parcel in, again."},
+    {id:uid(), date:addDaysStr(t,-2), text:"A quiet morning and coffee that was still hot."},
+    {id:uid(), date:addDaysStr(t,-4), text:"Dev calling just to check in, no reason needed."}
+  ];
+  S.journal = [
+    {id:uid(), date:addDaysStr(t,-1), text:"Today was slower than planned and somehow more got done. The walk helped more than the extra hour at the desk would have. Note to self: protect the walk."}
+  ];
+  S.letter = { text:"Dear future me — if you are reading this, the shop either worked or it didn't, and either way we learned how to build something from nothing. Be proud of the trying. Keep the walks.", openDate:addDaysStr(t,180), sealed:true };
+  return S;
+}
+
+function load(){
+  try{
+    var raw = localStorage.getItem(KEY);
+    if(raw){ var s = JSON.parse(raw); if(s && s.settings) return s; }
+  }catch(e){}
+  return null;
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+var S = load();
+if(!S){ S = sampleState(); save(); }
+
+var ui = { view:"home", planTab:"day", selDate:todayStr(), calCursor:todayStr().slice(0,7), debtMode:"snowball", timerLeft:25*60, timerRun:false, timerMode:25, soundOn:null };
+
+/* ================= Settings / appearance ================= */
+function applySettings(){
+  var st = S.settings, root = document.documentElement;
+  root.setAttribute("data-theme", st.theme);
+  var dark = st.mode==="dark" || (st.mode==="system" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  root.setAttribute("data-mode", dark ? "dark" : "light");
+  root.setAttribute("data-textsize", st.textSize);
+  root.setAttribute("data-easyread", st.easyRead ? "1" : "0");
+  root.setAttribute("data-foggy", st.foggy ? "1" : "0");
+  root.setAttribute("data-calm", st.calm ? "1" : "0");
+  root.setAttribute("data-lowbattery", st.lowBattery ? "1" : "0");
+  $("#brightnessWrap").style.filter = "brightness(" + (st.brightness/100) + ")";
+}
+function setSetting(k, v){ S.settings[k] = v; save(); applySettings(); render(); }
+
+/* ================= Navigation ================= */
+function go(view){
+  ui.view = view;
+  $$(".view").forEach(function(v){ v.classList.toggle("active", v.id === "view-"+view); });
+  $$("[data-nav]").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-nav") === view); });
+  window.scrollTo(0,0);
+  icons();
+}
+$$("[data-nav]").forEach(function(b){ b.addEventListener("click", function(){ go(b.getAttribute("data-nav")); }); });
+
+/* ================= Shared pieces ================= */
+function pageHead(title, lede){
+  return '<div class="pagehead"><div><h1>'+esc(title)+'</h1><p class="lede">'+esc(lede)+'</p></div></div>';
+}
+function rowHTML(item, opts){
+  opts = opts || {};
+  var h = '<div class="row'+(item.done?' done':'')+'">';
+  if(opts.tick !== false && typeof item.done === "boolean"){
+    h += '<button class="tick'+(item.done?' on':'')+'" aria-label="Mark done" onclick="'+opts.onToggle+'(\''+item.id+'\')"><i data-lucide="check"></i></button>';
+  }
+  h += '<div class="grow"><div class="title">'+esc(opts.title || item.text || item.title || item.name || "")+'</div>';
+  if(opts.meta) h += '<div class="meta">'+esc(opts.meta)+'</div>';
+  h += '</div>';
+  if(opts.right) h += opts.right;
+  if(opts.onDelete) h += '<button class="iconbtn" aria-label="Delete" onclick="'+opts.onDelete+'(\''+item.id+'\')"><i data-lucide="trash-2"></i></button>';
+  return h + '</div>';
+}
+function emptyHTML(text){ return '<p class="empty">'+esc(text)+'</p>'; }
+function findById(arr, id){ for(var i=0;i<arr.length;i++) if(arr[i].id===id) return arr[i]; return null; }
+function toggleIn(arrName, id){ var it = findById(S[arrName], id); if(it){ it.done = !it.done; save(); render(); } }
+function deleteFrom(arrName, id){ S[arrName] = S[arrName].filter(function(x){ return x.id !== id; }); save(); render(); }
+function addFromInput(arrName, inputId, extra){
+  var inp = document.getElementById(inputId);
+  var v = inp.value.trim(); if(!v) return;
+  var item = { id: uid(), text: v };
+  if(extra) for(var k in extra) item[k] = extra[k];
+  if(typeof item.done === "undefined" && arrName !== "brainDump" && arrName !== "ideas" && arrName !== "gifts") item.done = false;
+  S[arrName].push(item); save(); render();
+  toast("Added");
+}
+
+/* ================= Money maths ================= */
+function billsTotal(){ return S.bills.reduce(function(a,b){ return a + (Number(b.amount)||0); }, 0); }
+function billsUnpaid(){ return S.bills.filter(function(b){ return !b.paid; }).reduce(function(a,b){ return a + (Number(b.amount)||0); }, 0); }
+function assetsTotal(){ return S.accounts.filter(function(a){ return a.kind==="asset"; }).reduce(function(a,b){ return a + (Number(b.amount)||0); }, 0); }
+function debtTotal(){ return S.debts.reduce(function(a,b){ return a + (Number(b.balance)||0); }, 0); }
+function netWorth(){ return assetsTotal() - debtTotal(); }
+function safePerDay(){
+  var now = new Date();
+  var daysLeft = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate() - now.getDate() + 1;
+  var left = (Number(S.income)||0) - billsTotal() - (Number(S.savingsGoal)||0);
+  return { perDay: Math.max(0, left / Math.max(1, daysLeft)), daysLeft: daysLeft, left: left };
+}
+function medAlerts(){ return S.meds.filter(function(m){ return (Number(m.supply)||0) <= 7; }); }
+
+/* ================= Radar (Year Map) ================= */
+function hubScores(){
+  var done = function(arr){ return arr.filter(function(x){ return x.done; }).length; };
+  var cap = function(v){ return Math.max(8, Math.min(100, Math.round(v))); };
+  return [
+    {label:"Plan", v: cap(S.tasks.length ? (done(S.tasks)/S.tasks.length)*100 : 10)},
+    {label:"Money", v: cap(30 + S.noSpend.length*9 + (netWorth() > 0 ? 22 : 0))},
+    {label:"Goals", v: cap(S.goals.length ? S.goals.reduce(function(a,g){ return a+(Number(g.progress)||0); },0)/S.goals.length : 10)},
+    {label:"Learn", v: cap(18 + S.books.length*14 + S.courses.length*16)},
+    {label:"Explore", v: cap(15 + S.trips.length*16 + S.bookings.length*14)},
+    {label:"People", v: cap(20 + S.people.length*13 + S.events.length*10)},
+    {label:"Career", v: cap(22 + S.incomeStreams.length*15 + done(S.hustle)*10)},
+    {label:"House", v: cap(20 + S.inventory.length*11 + done(S.morning)*6)},
+    {label:"Mind", v: cap(16 + S.gratitude.length*14 + S.journal.length*16)},
+    {label:"Wellness", v: cap(18 + S.fitness.length*13 + S.recipes.length*9)}
+  ];
+}
+function radarSVG(){
+  var scores = hubScores(), cx = 170, cy = 158, R = 108, n = scores.length, i, a, pts = "", grid = "", labels = "";
+  for(var ring=1; ring<=4; ring++){
+    var rp = [];
+    for(i=0;i<n;i++){ a = -Math.PI/2 + i*2*Math.PI/n; rp.push((cx + Math.cos(a)*R*ring/4).toFixed(1)+","+(cy + Math.sin(a)*R*ring/4).toFixed(1)); }
+    grid += '<polygon points="'+rp.join(" ")+'" fill="none" stroke="var(--line2)" stroke-width="1"/>';
+  }
+  for(i=0;i<n;i++){
+    a = -Math.PI/2 + i*2*Math.PI/n;
+    grid += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+Math.cos(a)*R).toFixed(1)+'" y2="'+(cy+Math.sin(a)*R).toFixed(1)+'" stroke="var(--line)" stroke-width="1"/>';
+    pts += (cx + Math.cos(a)*R*scores[i].v/100).toFixed(1)+","+(cy + Math.sin(a)*R*scores[i].v/100).toFixed(1)+" ";
+    var lx = cx + Math.cos(a)*(R+24), ly = cy + Math.sin(a)*(R+18);
+    labels += '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--ink2)">'+scores[i].label+'</text>';
+    labels += '<text x="'+lx.toFixed(1)+'" y="'+(ly+13).toFixed(1)+'" text-anchor="middle" font-size="10" fill="var(--muted)">'+scores[i].v+'</text>';
+  }
+  return '<svg viewBox="0 0 340 316" style="width:100%;max-width:400px;display:block;margin:0 auto" role="img" aria-label="Life balance radar chart">'
+    + grid + '<polygon points="'+pts+'" fill="var(--accent)" fill-opacity="0.22" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>' + labels + '</svg>';
+}
+
+/* ================= Sample banner ================= */
+function renderSample(){
+  var slot = $("#sampleSlot");
+  if(!S.sample){ slot.innerHTML = ""; return; }
+  slot.innerHTML = '<div class="samplebar"><i data-lucide="flask-conical"></i>'
+    + '<div class="grow"><strong>You are looking at sample data</strong> for “'+esc(S.settings.name)+'” — tasks, money, goals and more, filled in so you can see how everything works. Play with it freely.</div>'
+    + '<button class="btn ghost small" onclick="clearSample()">Start fresh with my own data</button></div>';
+}
+function clearSample(){
+  var keep = S.settings; S = blankState(); S.settings = keep; S.sample = false; save(); render();
+  toast("Sample cleared — the planner is yours now");
+}
+function loadSample(){
+  var keep = S.settings; S = sampleState(); S.settings = keep; save(); render();
+  toast("Sample data loaded");
+}
+
+/* ================= Home ================= */
+var MOODS = [ {v:1,icon:"cloud-rain",label:"Rough"}, {v:2,icon:"cloud",label:"Low"}, {v:3,icon:"cloud-sun",label:"Okay"}, {v:4,icon:"sun",label:"Good"}, {v:5,icon:"sparkles",label:"Great"} ];
+var ENERGY = [ {v:1,label:"Empty"}, {v:2,label:"Low"}, {v:3,label:"Steady"}, {v:4,label:"Good"}, {v:5,label:"Buzzing"} ];
+function setMood(kind, v){ var t = todayStr(); if(!S.moodLog[t]) S.moodLog[t] = {}; S.moodLog[t][kind] = v; save(); render(); }
+function toggleTop(id){ toggleIn("topThree", id); }
+function delTop(id){ deleteFrom("topThree", id); }
+function delDump(id){ deleteFrom("brainDump", id); }
+function dumpToTask(id){
+  var it = findById(S.brainDump, id); if(!it) return;
+  S.tasks.push({ id:uid(), title:it.text, date:todayStr(), time:"", hub:"plan", repeat:"none", done:false });
+  S.brainDump = S.brainDump.filter(function(x){ return x.id !== id; });
+  save(); render(); toast("Moved to today's Plan");
+}
+function hubCounts(id){
+  switch(id){
+    case "plan": return S.tasks.filter(function(x){ return !x.done; }).length + " open";
+    case "money": return money(safePerDay().perDay) + "/day";
+    case "goals": return S.goals.length + " active";
+    case "learn": return S.books.length + " books";
+    case "explore": return S.trips.length + " dream trips";
+    case "people": return S.people.length + " in circle";
+    case "career": return S.incomeStreams.length + " streams";
+    case "household": return S.inventory.length + " items listed";
+    case "mind": return S.gratitude.length + " in the jar";
+    case "wellness": return S.fitness.length + " sessions";
+  }
+  return "";
+}
+function renderHome(){
+  var t = todayStr();
+  var mood = S.moodLog[t] || {};
+  var spd = safePerDay();
+  var alerts = medAlerts();
+  var todayTasks = S.tasks.filter(function(x){ return x.date === t; });
+  var h = pageHead("Good " + (new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening") + ", " + S.settings.name,
+    fmtDateLong(t) + " · One calm page for the whole of life — pick a hub, or start with your Top Three.");
+
+  if(alerts.length){
+    h += '<div class="alert" style="margin-bottom:16px"><i data-lucide="pill"></i><div><strong>Refill soon:</strong> '
+      + alerts.map(function(m){ return esc(m.name) + " (" + m.supply + " days left)"; }).join(" · ")
+      + ' — details in <button style="text-decoration:underline;font-weight:700" onclick="go(\'wellness\')">Wellness</button>.</div></div>';
+  }
+
+  /* Life Circle */
+  h += '<div class="card foggyhide" style="margin-bottom:16px"><h3><i data-lucide="orbit"></i>Life Circle</h3>'
+    + '<p class="cardsub">Home in the middle, ten hubs around it. Tap any hub to open it.</p><div class="wheelwrap"><div class="wheel">';
+  var spokes = "";
+  for(var i=0;i<HUBS.length;i++){
+    var a = -Math.PI/2 + i*2*Math.PI/HUBS.length;
+    spokes += '<line x1="50" y1="50" x2="'+(50+Math.cos(a)*36)+'" y2="'+(50+Math.sin(a)*36)+'" stroke="var(--line2)" stroke-width="0.7"/>';
+  }
+  h += '<svg class="spokes" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' + spokes + '</svg>';
+  h += '<div class="center"><i data-lucide="home"></i><div class="t">Home</div><div class="s">you are here</div></div>';
+  HUBS.forEach(function(hub, idx){
+    var ang = -Math.PI/2 + idx*2*Math.PI/HUBS.length;
+    var x = 50 + Math.cos(ang)*39.5, y = 50 + Math.sin(ang)*39.5;
+    h += '<button class="node" style="left:'+x+'%;top:'+y+'%" onclick="go(\''+hub.id+'\')" aria-label="Open '+hub.name+'">'
+      + '<i data-lucide="'+hub.icon+'"></i><span class="n">'+hub.name+'</span><span class="c">'+esc(hubCounts(hub.id))+'</span></button>';
+  });
+  h += '</div></div></div>';
+
+  h += '<div class="grid c2">';
+
+  /* Mood + energy */
+  h += '<div class="card"><h3><i data-lucide="smile"></i>How is today, honestly?</h3><p class="cardsub">Mood first — the plan can bend around it.</p>'
+    + '<div class="moods">' + MOODS.map(function(m){ return '<button class="moodbtn'+(mood.mood===m.v?' on':'')+'" onclick="setMood(\'mood\','+m.v+')"><i data-lucide="'+m.icon+'"></i>'+m.label+'</button>'; }).join("") + '</div>'
+    + '<p class="small" style="font-weight:600;margin:14px 0 7px">Energy</p><div class="moods">'
+    + ENERGY.map(function(e){ return '<button class="moodbtn'+(mood.energy===e.v?' on':'')+'" onclick="setMood(\'energy\','+e.v+')">'+e.label+'</button>'; }).join("") + '</div></div>';
+
+  /* Top three */
+  h += '<div class="card"><h3><i data-lucide="list-checks"></i>Top Three</h3><p class="cardsub">If only three things happen today, make it these.</p><div class="list">'
+    + (S.topThree.length ? S.topThree.map(function(x){ return rowHTML(x, {onToggle:"toggleTop", onDelete:"delTop"}); }).join("") : emptyHTML("Nothing chosen yet — add your first priority below."))
+    + '</div><div class="addbar"><input id="addTop" type="text" placeholder="Add a priority…" maxlength="90" onkeydown="if(event.key===\'Enter\')addTopFn()"><button class="btn small" onclick="addTopFn()">Add</button></div></div>';
+
+  /* Safe to spend */
+  h += '<div class="card foggyhide"><h3><i data-lucide="wallet"></i>Safe to Spend</h3><p class="cardsub">After bills and your savings goal, for the rest of this month.</p>'
+    + '<div class="bignum">' + money(spd.perDay) + ' <span class="small muted" style="font-family:var(--font-body);font-weight:600">per day</span></div>'
+    + '<p class="small muted" style="margin-top:6px">' + money(Math.max(0, spd.left)) + ' left to spread over ' + spd.daysLeft + ' days · Net worth ' + money(netWorth()) + '</p>'
+    + '<button class="btn ghost small" style="margin-top:12px" onclick="go(\'money\')">Open Money</button></div>';
+
+  /* Today + Brain dump */
+  h += '<div class="card foggyhide"><h3><i data-lucide="calendar-day"></i>Today\u2019s plan</h3><p class="cardsub">' + todayTasks.length + ' thing' + (todayTasks.length===1?"":"s") + ' on the list for today.</p><div class="list">'
+    + (todayTasks.length ? todayTasks.slice(0,5).map(function(x){ return rowHTML(x, {onToggle:"toggleTask", onDelete:"delTask", meta:(x.time?x.time+" · ":"")+hubName(x.hub)}); }).join("") : emptyHTML("A clear day. Enjoy it, or plan something kind."))
+    + '</div><button class="btn ghost small" style="margin-top:10px" onclick="go(\'plan\')">Open Plan</button></div>';
+
+  h += '<div class="card"><h3><i data-lucide="brain"></i>Brain Dump</h3><p class="cardsub">Out of your head, onto the page. Sort it later — or send it straight to today\u2019s plan.</p><div class="list">'
+    + (S.brainDump.length ? S.brainDump.map(function(x){
+        return '<div class="row"><div class="grow"><div class="title" style="font-weight:500">'+esc(x.text)+'</div></div>'
+          + '<button class="iconbtn" title="Send to Plan" aria-label="Send to Plan" onclick="dumpToTask(\''+x.id+'\')"><i data-lucide="arrow-right"></i></button>'
+          + '<button class="iconbtn" title="Delete" aria-label="Delete" onclick="delDump(\''+x.id+'\')"><i data-lucide="trash-2"></i></button></div>';
+      }).join("") : emptyHTML("Mind is clear. Lovely."))
+    + '</div><div class="addbar"><input id="addDump" type="text" placeholder="Whatever is looping in your head…" maxlength="120" onkeydown="if(event.key===\'Enter\')addFromInput(\'brainDump\',\'addDump\')"><button class="btn small" onclick="addFromInput(\'brainDump\',\'addDump\')">Dump it</button></div></div>';
+
+  /* Affirmation */
+  var dayIdx = Math.floor(new Date(t+"T12:00:00").getTime()/86400000) % AFFIRMATIONS.length;
+  h += '<div class="card foggyhide"><h3><i data-lucide="sun"></i>Today\u2019s affirmation</h3>'
+    + '<p style="font-family:var(--font-display);font-size:1.22rem;line-height:1.45">“' + esc(AFFIRMATIONS[dayIdx]) + '”</p>'
+    + '<button class="btn ghost small" style="margin-top:12px" onclick="go(\'mind\')">Open Mind — gratitude jar &amp; journal</button></div>';
+
+  h += '</div>';
+
+  /* Year map */
+  h += '<div class="card foggyhide" style="margin-top:16px"><h3><i data-lucide="radar"></i>Year Map — life balance</h3>'
+    + '<p class="cardsub">Built from your own data: finished tasks, no-spend days, goal progress, your gratitude jar and more. It moves as you live, not as you perform.</p>'
+    + radarSVG() + '</div>';
+
+  $("#view-home").innerHTML = h;
+}
+function addTopFn(){ addFromInput("topThree", "addTop", {done:false}); }
+
+/* ================= Plan ================= */
+function toggleTask(id){ toggleIn("tasks", id); }
+function delTask(id){ deleteFrom("tasks", id); }
+function setPlanTab(tab){ ui.planTab = tab; render(); }
+function selDay(d){ ui.selDate = d; ui.planTab = "day"; render(); }
+function calMove(n){
+  var parts = ui.calCursor.split("-"); var d = new Date(Number(parts[0]), Number(parts[1])-1+n, 1);
+  ui.calCursor = d.getFullYear()+"-"+pad(d.getMonth()+1);
+  render();
+}
+function addTaskFn(){
+  var title = $("#taskTitle").value.trim(); if(!title){ toast("Give the task a name first"); return; }
+  S.tasks.push({ id:uid(), title:title, date:$("#taskDate").value || todayStr(), time:$("#taskTime").value || "",
+    hub:$("#taskHub").value, repeat:$("#taskRepeat").value, done:false });
+  save(); ui.selDate = $("#taskDate").value || todayStr(); render(); toast("Task added");
+}
+function taskRow(x){
+  return rowHTML(x, { onToggle:"toggleTask", onDelete:"delTask",
+    meta: (x.time ? x.time + " · " : "") + hubName(x.hub) + (x.repeat && x.repeat!=="none" ? " · repeats " + x.repeat : "") });
+}
+function renderPlan(){
+  var t = todayStr();
+  var h = pageHead("Plan", "Day, week and month in one place — plus a focus timer with calm sounds when you need to actually do the thing.");
+  h += '<div style="margin-bottom:16px"><div class="seg" role="tablist">'
+    + ["day","week","month"].map(function(tab){ return '<button class="'+(ui.planTab===tab?'on':'')+'" onclick="setPlanTab(\''+tab+'\')">'+tab[0].toUpperCase()+tab.slice(1)+'</button>'; }).join("")
+    + '</div></div>';
+
+  h += '<div class="grid c2"><div>';
+
+  if(ui.planTab === "day"){
+    var dayTasks = S.tasks.filter(function(x){ return x.date === ui.selDate; })
+      .sort(function(a,b){ return (a.time||"99") < (b.time||"99") ? -1 : 1; });
+    h += '<div class="card"><h3><i data-lucide="calendar-day"></i>' + (ui.selDate===t ? "Today" : fmtDate(ui.selDate)) + '</h3>'
+      + '<p class="cardsub">' + fmtDateLong(ui.selDate) + '</p>'
+      + '<div style="display:flex;gap:8px;margin-bottom:10px"><input type="date" value="'+ui.selDate+'" onchange="ui.selDate=this.value;render()" style="background:var(--bg);border:1px solid var(--line2);border-radius:10px;padding:8px 10px">'
+      + '<button class="btn ghost small" onclick="ui.selDate=todayStr();render()">Jump to today</button></div>'
+      + '<div class="list">' + (dayTasks.length ? dayTasks.map(taskRow).join("") : emptyHTML("Nothing scheduled. A blank day is also a plan.")) + '</div></div>';
+  }
+  if(ui.planTab === "week"){
+    h += '<div class="card"><h3><i data-lucide="calendar-range"></i>Next 7 days</h3><p class="cardsub">Tap a day to open it.</p><div class="grid" style="gap:10px">';
+    for(var i=0;i<7;i++){
+      var ds = addDaysStr(t, i);
+      var items = S.tasks.filter(function(x){ return x.date === ds; });
+      h += '<button class="weekday'+(i===0?' today':'')+'" style="text-align:left" onclick="selDay(\''+ds+'\')"><strong>'+(i===0?"Today · ":"")+fmtDate(ds)+'</strong>'
+        + '<div class="small muted">' + (items.length ? items.map(function(x){ return esc((x.done?"✓ ":"")+x.title); }).join(" · ") : "Nothing scheduled") + '</div></button>';
+    }
+    h += '</div></div>';
+  }
+  if(ui.planTab === "month"){
+    var parts = ui.calCursor.split("-"), y = Number(parts[0]), m = Number(parts[1])-1;
+    var first = new Date(y, m, 1), startOffset = (first.getDay()+6)%7;
+    var daysIn = new Date(y, m+1, 0).getDate(), daysPrev = new Date(y, m, 0).getDate();
+    var monthName = first.toLocaleDateString(undefined, {month:"long", year:"numeric"});
+    h += '<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+      + '<button class="iconbtn" aria-label="Previous month" onclick="calMove(-1)"><i data-lucide="chevron-left"></i></button>'
+      + '<h3 style="margin:0">'+monthName+'</h3>'
+      + '<button class="iconbtn" aria-label="Next month" onclick="calMove(1)"><i data-lucide="chevron-right"></i></button></div>'
+      + '<div class="cal">' + ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(function(d){ return '<div class="dow">'+d+'</div>'; }).join("");
+    var cells = [];
+    for(var c=0;c<startOffset;c++) cells.push({ d: daysPrev-startOffset+1+c, out:true, ds: dstr(new Date(y, m-1, daysPrev-startOffset+1+c)) });
+    for(var dd=1; dd<=daysIn; dd++) cells.push({ d: dd, out:false, ds: dstr(new Date(y, m, dd)) });
+    while(cells.length % 7 !== 0){ var nd = cells.length - (startOffset+daysIn) + 1; cells.push({ d: nd, out:true, ds: dstr(new Date(y, m+1, nd)) }); }
+    cells.forEach(function(cell){
+      var dayTasks = S.tasks.filter(function(x){ return x.date === cell.ds; });
+      var dots = dayTasks.slice(0,3).map(function(x){ return '<span class="dot'+(x.done?' done':'')+'"></span>'; }).join("");
+      h += '<button class="day'+(cell.out?' out':'')+(cell.ds===t?' today':'')+(cell.ds===ui.selDate?' sel':'')+'" onclick="selDay(\''+cell.ds+'\')"><span>'+cell.d+'</span><span class="dots">'+dots+'</span></button>';
+    });
+    h += '</div><p class="small muted" style="margin-top:10px">Dots are tasks — the green ones are done. Tap any day to open it.</p></div>';
+  }
+
+  /* Add task */
+  h += '<div class="card" style="margin-top:16px"><h3><i data-lucide="plus"></i>Add a task</h3>'
+    + '<div class="field"><label for="taskTitle">Task</label><input id="taskTitle" type="text" placeholder="What needs doing?" maxlength="100"></div>'
+    + '<div class="formrow"><div class="field"><label for="taskDate">Date</label><input id="taskDate" type="date" value="'+ui.selDate+'"></div>'
+    + '<div class="field"><label for="taskTime">Time (optional)</label><input id="taskTime" type="time"></div></div>'
+    + '<div class="formrow"><div class="field"><label for="taskHub">Hub</label><select id="taskHub">'
+    + HUBS.map(function(hb){ return '<option value="'+hb.id+'">'+hb.name+'</option>'; }).join("") + '</select></div>'
+    + '<div class="field"><label for="taskRepeat">Repeats</label><select id="taskRepeat"><option value="none">Never</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select></div></div>'
+    + '<button class="btn" onclick="addTaskFn()"><i data-lucide="plus"></i>Add task</button></div>';
+
+  h += '</div><div>';
+
+  /* Focus timer */
+  var mm = pad(Math.floor(ui.timerLeft/60)), ss = pad(ui.timerLeft%60);
+  h += '<div class="card"><h3><i data-lucide="timer"></i>Focus timer</h3><p class="cardsub">One thing, one timer. Sounds are made live by your browser — no audio files.</p>'
+    + '<div class="timerface" id="timerFace">'+mm+':'+ss+'</div>'
+    + '<div class="timermodes" style="margin:14px 0">'
+    + [15,25,50].map(function(n){ return '<button class="btn ghost small" onclick="setTimerMode('+n+')">'+n+' min</button>'; }).join("")
+    + '</div>'
+    + '<div class="timermodes">'
+    + '<button class="btn" onclick="toggleTimer()"><i data-lucide="'+(ui.timerRun?'pause':'play')+'"></i>'+(ui.timerRun?'Pause':'Start focusing')+'</button>'
+    + '<button class="btn ghost" onclick="resetTimer()">Reset</button></div>'
+    + '<p class="small" style="font-weight:600;margin:18px 0 8px">Soundscape</p><div class="timermodes">'
+    + [["rain","cloud-rain","Rain"],["cafe","coffee","Café"],["bells","bell","Bells"]].map(function(s){
+        return '<button class="btn '+(ui.soundOn===s[0]?'':'ghost')+' small" onclick="toggleSound(\''+s[0]+'\')"><i data-lucide="'+s[1]+'"></i>'+s[2]+'</button>';
+      }).join("")
+    + '</div></div>';
+
+  /* Weekly reset */
+  h += '<div class="card" style="margin-top:16px"><h3><i data-lucide="refresh-ccw"></i>Weekly reset</h3><p class="cardsub">Ten quiet minutes, once a week. Tick them off, then close the planner and rest.</p><div class="list">'
+  var resetItems = [
+    "Empty the Brain Dump — every item placed or deleted",
+    "Move unfinished tasks to real dates, not 'someday'",
+    "Check next week's bills against the bank balance",
+    "One line in the gratitude jar",
+    "Pick next week's Top Three for Monday"
+  ];
+  if(!S._reset) S._reset = resetItems.map(function(x){ return {id:uid(), text:x, done:false}; });
+  h += S._reset.map(function(x){ return rowHTML(x, {onToggle:"toggleReset"}); }).join("")
+    + '</div><button class="btn ghost small" style="margin-top:10px" onclick="clearReset()">Start a fresh reset</button></div>';
+
+  h += '</div></div>';
+  $("#view-plan").innerHTML = h;
+}
+function toggleReset(id){ var it = findById(S._reset||[], id); if(it){ it.done = !it.done; save(); render(); } }
+function clearReset(){ (S._reset||[]).forEach(function(x){ x.done = false; }); save(); render(); }
+
+/* Timer + soundscapes (Web Audio, generated live) */
+var timerInt = null;
+function setTimerMode(n){ ui.timerMode = n; ui.timerLeft = n*60; ui.timerRun = false; clearInterval(timerInt); render(); }
+function resetTimer(){ ui.timerLeft = ui.timerMode*60; ui.timerRun = false; clearInterval(timerInt); render(); }
+function toggleTimer(){
+  ui.timerRun = !ui.timerRun;
+  clearInterval(timerInt);
+  if(ui.timerRun){
+    timerInt = setInterval(function(){
+      ui.timerLeft--;
+      var f = $("#timerFace");
+      if(f) f.textContent = pad(Math.floor(ui.timerLeft/60))+":"+pad(ui.timerLeft%60);
+      if(ui.timerLeft <= 0){ clearInterval(timerInt); ui.timerRun = false; ui.timerLeft = ui.timerMode*60; toast("Focus session complete — take a real break"); render(); }
+    }, 1000);
+  }
+  render();
+}
+var AC = null, soundNodes = null, bellInt = null;
+function ensureAudio(){ if(!AC){ var Ctx = window.AudioContext || window.webkitAudioContext; if(Ctx) AC = new Ctx(); } if(AC && AC.state === "suspended") AC.resume(); return AC; }
+function stopSound(){
+  if(soundNodes){ try{ soundNodes.src.stop(); }catch(e){} try{ soundNodes.gain.disconnect(); }catch(e){} soundNodes = null; }
+  if(bellInt){ clearInterval(bellInt); bellInt = null; }
+}
+/* ================= Money ================= */
+function toggleBill(id){ var b = findById(S.bills, id); if(b){ b.paid = !b.paid; save(); render(); } }
+function delBill(id){ deleteFrom("bills", id); }
+function delAcct(id){ deleteFrom("accounts", id); }
+function delDebt(id){ deleteFrom("debts", id); }
+function toggleNoSpend(){
+  var t = todayStr();
+  var i = S.noSpend.indexOf(t);
+  if(i >= 0) S.noSpend.splice(i,1); else S.noSpend.push(t);
+  save(); render();
+}
+function setDebtMode(m){ ui.debtMode = m; render(); }
+function addBillFn(){
+  var name = $("#billName").value.trim(), amt = parseFloat($("#billAmt").value), day = parseInt($("#billDay").value, 10);
+  if(!name || isNaN(amt)){ toast("Add a bill name and amount"); return; }
+  S.bills.push({ id:uid(), name:name, amount:amt, dueDay: isNaN(day)?1:Math.min(31,Math.max(1,day)), paid:false });
+  save(); render(); toast("Bill added");
+}
+function addAcctFn(){
+  var name = $("#acctName").value.trim(), amt = parseFloat($("#acctAmt").value);
+  if(!name || isNaN(amt)){ toast("Add an account name and balance"); return; }
+  S.accounts.push({ id:uid(), name:name, amount:amt, kind:$("#acctKind").value });
+  save(); render(); toast("Account added");
+}
+function addDebtFn(){
+  var name = $("#debtName").value.trim(), bal = parseFloat($("#debtBal").value), apr = parseFloat($("#debtApr").value), min = parseFloat($("#debtMin").value);
+  if(!name || isNaN(bal)){ toast("Add a debt name and balance"); return; }
+  S.debts.push({ id:uid(), name:name, balance:bal, apr:isNaN(apr)?0:apr, min:isNaN(min)?0:min });
+  save(); render(); toast("Debt added");
+}
+function saveMoneyBasics(){
+  var inc = parseFloat($("#incInput").value), sav = parseFloat($("#savInput").value);
+  if(!isNaN(inc)) S.income = inc;
+  if(!isNaN(sav)) S.savingsGoal = sav;
+  save(); render(); toast("Money basics saved");
+}
+function renderMoney(){
+  var spd = safePerDay(), t = todayStr();
+  var h = pageHead("Money", "Safe to Spend first, the full picture second. No judgement anywhere on this page — just numbers that help.");
+  h += '<div class="grid c3">'
+    + '<div class="card"><h3><i data-lucide="shield-check"></i>Safe to Spend</h3><div class="bignum">'+money(spd.perDay)+'</div><p class="small muted">per day for the remaining '+spd.daysLeft+' days of this month, after bills ('+money(billsTotal())+') and your '+money(S.savingsGoal)+' savings goal.</p></div>'
+    + '<div class="card"><h3><i data-lucide="scale"></i>Net worth</h3><div class="bignum">'+money(netWorth())+'</div><p class="small muted">Assets '+money(assetsTotal())+' minus debts '+money(debtTotal())+'.</p></div>'
+    + '<div class="card"><h3><i data-lucide="calendar-x-2"></i>No-spend days</h3><div class="bignum">'+S.noSpend.length+'</div><p class="small muted">days logged. '+(S.noSpend.indexOf(t)>=0 ? "Today is one of them — nicely done." : "Today still open.")+'</p>'
+    + '<button class="btn '+(S.noSpend.indexOf(t)>=0?'ghost':'')+' small" style="margin-top:10px" onclick="toggleNoSpend()">'+(S.noSpend.indexOf(t)>=0 ? "Undo today" : "Mark today no-spend")+'</button></div>'
+    + '</div>';
+
+  h += '<div class="grid c2" style="margin-top:16px"><div>'
+    + '<div class="card"><h3><i data-lucide="receipt"></i>Bills this month</h3><p class="cardsub">'+money(billsUnpaid())+' still to pay of '+money(billsTotal())+' total. Tap the circle when a bill is paid.</p><div class="list">'
+    + (S.bills.length ? S.bills.slice().sort(function(a,b){ return a.dueDay-b.dueDay; }).map(function(b){
+        b.done = b.paid;
+        return rowHTML(b, { onToggle:"toggleBill", onDelete:"delBill", title:b.name, meta:"Due on the "+b.dueDay+"th · monthly", right:'<span class="pill">'+money(b.amount)+'</span>' });
+      }).join("") : emptyHTML("No bills added yet."))
+    + '</div>'
+    + '<div class="formrow" style="margin-top:12px"><div class="field" style="margin:0"><label>Bill name</label><input id="billName" type="text" placeholder="e.g. Water"></div>'
+    + '<div class="field" style="margin:0"><label>Amount ($)</label><input id="billAmt" type="number" step="0.01" min="0" placeholder="0.00"></div></div>'
+    + '<div class="field" style="margin-top:10px"><label>Due day of month (1–31)</label><input id="billDay" type="number" min="1" max="31" value="1"></div>'
+    + '<button class="btn small" onclick="addBillFn()"><i data-lucide="plus"></i>Add bill</button></div>'
+
+    + '<div class="card" style="margin-top:16px"><h3><i data-lucide="sliders-horizontal"></i>Monthly basics</h3><p class="cardsub">These two numbers power Safe to Spend.</p>'
+    + '<div class="formrow"><div class="field" style="margin:0"><label>Monthly take-home income ($)</label><input id="incInput" type="number" step="0.01" min="0" value="'+(S.income||"")+'"></div>'
+    + '<div class="field" style="margin:0"><label>Savings goal ($)</label><input id="savInput" type="number" step="0.01" min="0" value="'+(S.savingsGoal||"")+'"></div></div>'
+    + '<button class="btn small" style="margin-top:12px" onclick="saveMoneyBasics()">Save basics</button></div>'
+    + '</div><div>'
+
+    + '<div class="card"><h3><i data-lucide="landmark"></i>Accounts &amp; assets</h3><p class="cardsub">What you have, in one calm list.</p><div class="list">'
+    + (S.accounts.length ? S.accounts.map(function(a){
+        return rowHTML(a, { tick:false, onDelete:"delAcct", title:a.name, meta:"Asset", right:'<span class="pill">'+money(a.amount)+'</span>' });
+      }).join("") : emptyHTML("No accounts yet."))
+    + '</div>'
+    + '<div class="formrow" style="margin-top:12px"><div class="field" style="margin:0"><label>Account name</label><input id="acctName" type="text" placeholder="e.g. Savings"></div>'
+    + '<div class="field" style="margin:0"><label>Balance ($)</label><input id="acctAmt" type="number" step="0.01" placeholder="0.00"></div></div>'
+    + '<input type="hidden" id="acctKind" value="asset">'
+    + '<button class="btn small" style="margin-top:12px" onclick="addAcctFn()"><i data-lucide="plus"></i>Add account</button></div>'
+
+    + '<div class="card" style="margin-top:16px"><h3><i data-lucide="trending-down"></i>Debt payoff order</h3>'
+    + '<p class="cardsub">Snowball = smallest balance first (quick wins). Avalanche = highest interest first (cheapest overall). Both work — the best one is the one you will actually follow.</p>'
+    + '<div class="seg" style="margin-bottom:12px"><button class="'+(ui.debtMode==='snowball'?'on':'')+'" onclick="setDebtMode(\'snowball\')">Snowball</button><button class="'+(ui.debtMode==='avalanche'?'on':'')+'" onclick="setDebtMode(\'avalanche\')">Avalanche</button></div>'
+    + '<div class="list">';
+  var sorted = S.debts.slice().sort(function(a,b){ return ui.debtMode === "snowball" ? a.balance - b.balance : b.apr - a.apr; });
+  h += (sorted.length ? sorted.map(function(d, i){
+      return '<div class="row"><span class="pill">'+(i+1)+'</span><div class="grow"><div class="title">'+esc(d.name)+'</div><div class="meta">'+money(d.balance)+' · '+d.apr+'% APR · min '+money(d.min)+'/mo</div></div>'
+        + '<button class="iconbtn" aria-label="Delete" onclick="delDebt(\''+d.id+'\')"><i data-lucide="trash-2"></i></button></div>';
+    }).join("") : emptyHTML("No debts recorded — that is a good page to have empty."));
+  h += '</div>'
+    + '<div class="formrow" style="margin-top:12px"><div class="field" style="margin:0"><label>Debt name</label><input id="debtName" type="text" placeholder="e.g. Card"></div>'
+    + '<div class="field" style="margin:0"><label>Balance ($)</label><input id="debtBal" type="number" step="0.01" min="0" placeholder="0.00"></div></div>'
+    + '<div class="formrow" style="margin-top:10px"><div class="field" style="margin:0"><label>APR (%)</label><input id="debtApr" type="number" step="0.01" min="0" placeholder="0"></div>'
+    + '<div class="field" style="margin:0"><label>Minimum payment ($)</label><input id="debtMin" type="number" step="0.01" min="0" placeholder="0"></div></div>'
+    + '<button class="btn small" style="margin-top:12px" onclick="addDebtFn()"><i data-lucide="plus"></i>Add debt</button></div>'
+
+    + '</div></div>';
+  $("#view-money").innerHTML = h;
+}
+
+/* ================= Goals ================= */
+function delGoal(id){ deleteFrom("goals", id); }
+function bumpGoal(id, delta){
+  var g = findById(S.goals, id); if(!g) return;
+  g.progress = Math.max(0, Math.min(100, (Number(g.progress)||0) + delta));
+  save(); render();
+}
+function addGoalFn(){
+  var title = $("#goalTitle").value.trim(); if(!title){ toast("Give the goal a name"); return; }
+  S.goals.push({ id:uid(), title:title, hub:$("#goalHub").value, progress:parseInt($("#goalProg").value,10)||0, target:$("#goalTarget").value.trim(), note:"" });
+  save(); render(); toast("Goal added");
+}
+function renderGoals(){
+  var h = pageHead("Goals", "A few real goals, honestly tracked. Progress you can nudge with the + and − buttons whenever life moves.");
+  h += '<div class="grid c2">';
+  h += '<div class="card"><h3><i data-lucide="radar"></i>Year Map</h3><p class="cardsub">Your whole life at a glance — the same chart as Home, built from your data.</p>' + radarSVG() + '</div>';
+  h += '<div><div class="grid" style="gap:16px">';
+  h += S.goals.length ? S.goals.map(function(g){
+    return '<div class="card"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><h3 style="margin:0">'+esc(g.title)+'</h3>'
+      + '<button class="iconbtn" aria-label="Delete goal" onclick="delGoal(\''+g.id+'\')"><i data-lucide="trash-2"></i></button></div>'
+      + '<p class="cardsub">'+hubName(g.hub)+(g.target ? ' · target '+esc(g.target) : '')+'</p>'
+      + '<div class="bar"><i style="width:'+(Number(g.progress)||0)+'%"></i></div>'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-top:10px"><strong>'+(Number(g.progress)||0)+'%</strong>'
+      + '<button class="btn ghost small" onclick="bumpGoal(\''+g.id+'\',-5)">−5</button><button class="btn ghost small" onclick="bumpGoal(\''+g.id+'\',5)">+5</button>'
+      + (g.note ? '<span class="small muted" style="margin-left:6px">'+esc(g.note)+'</span>' : '') + '</div></div>';
+  }).join("") : '<div class="card">'+emptyHTML("No goals yet — add your first one below.")+'</div>';
+  h += '<div class="card"><h3><i data-lucide="plus"></i>Add a goal</h3>'
+    + '<div class="field"><label>Goal</label><input id="goalTitle" type="text" placeholder="What are you working toward?" maxlength="90"></div>'
+    + '<div class="formrow"><div class="field"><label>Hub</label><select id="goalHub">'+HUBS.map(function(hb){ return '<option value="'+hb.id+'">'+hb.name+'</option>'; }).join("")+'</select></div>'
+    + '<div class="field"><label>Target (text)</label><input id="goalTarget" type="text" placeholder="e.g. Jun 2027" maxlength="20"></div></div>'
+    + '<div class="field"><label>Starting progress (%)</label><input id="goalProg" type="number" min="0" max="100" value="0"></div>'
+    + '<button class="btn" onclick="addGoalFn()"><i data-lucide="plus"></i>Add goal</button></div>';
+  h += '</div></div></div>';
+  $("#view-goals").innerHTML = h;
+}
+
+/* ================= Learn / Explore / People / Career / Household ================= */
+function delBook(id){ deleteFrom("books", id); }
+function cycleBook(id){
+  var b = findById(S.books, id); if(!b) return;
+  var order = ["Want to read","Reading","Finished"];
+  var i = order.indexOf(b.status); b.status = order[(i+1)%3];
+  b.progress = b.status === "Finished" ? 100 : b.status === "Want to read" ? 0 : Math.max(5, b.progress||5);
+  save(); render();
+}
+function delIdea(id){ deleteFrom("ideas", id); }
+function delCourse(id){ deleteFrom("courses", id); }
+function addCourseFn(){
+  var name = $("#courseName").value.trim(); if(!name){ toast("Add a course name"); return; }
+  S.courses.push({ id:uid(), name:name, item:$("#courseItem").value.trim() || "Next assignment", due:$("#courseDue").value || "", grade:$("#courseGrade").value.trim() });
+  save(); render(); toast("Course added");
+}
+function renderLearn(){
+  var h = pageHead("Learn", "Books, bright ideas and coursework — curiosity, kept in one place.");
+  h += '<div class="grid c2"><div>'
+    + '<div class="card"><h3><i data-lucide="book-open"></i>Reading list</h3><p class="cardsub">Tap the status pill to move a book along.</p><div class="list">'
+    + (S.books.length ? S.books.map(function(b){
+        return rowHTML(b, { tick:false, onDelete:"delBook", title:b.title, meta:(b.progress||0)+"% read",
+          right:'<button class="pill" onclick="cycleBook(\''+b.id+'\')">'+esc(b.status)+'</button>' });
+      }).join("") : emptyHTML("No books yet."))
+    + '</div><div class="addbar"><input id="addBook" type="text" placeholder="Add a book — Title, Author" maxlength="90" onkeydown="if(event.key===\'Enter\')addBookFn()"><button class="btn small" onclick="addBookFn()">Add</button></div></div>'
+    + '<div class="card" style="margin-top:16px"><h3><i data-lucide="graduation-cap"></i>Courses, assignments &amp; grades</h3><div class="list">'
+    + (S.courses.length ? S.courses.map(function(c){
+        return rowHTML(c, { tick:false, onDelete:"delCourse", title:c.name, meta:esc(c.item)+(c.due ? " · due "+fmtDate(c.due) : ""), right: c.grade ? '<span class="pill">'+esc(c.grade)+'</span>' : "" });
+      }).join("") : emptyHTML("No courses yet."))
+    + '</div>'
+    + '<div class="formrow" style="margin-top:12px"><div class="field" style="margin:0"><label>Course</label><input id="courseName" type="text" placeholder="Course name"></div>'
+    + '<div class="field" style="margin:0"><label>Next item</label><input id="courseItem" type="text" placeholder="Assignment / exam"></div></div>'
+    + '<div class="formrow" style="margin-top:10px"><div class="field" style="margin:0"><label>Due date</label><input id="courseDue" type="date"></div>'
+    + '<div class="field" style="margin:0"><label>Latest grade</label><input id="courseGrade" type="text" placeholder="e.g. A-" maxlength="6"></div></div>'
+    + '<button class="btn small" style="margin-top:12px" onclick="addCourseFn()"><i data-lucide="plus"></i>Add course</button></div>'
+    + '</div><div>'
+    + '<div class="card"><h3><i data-lucide="lightbulb"></i>Ideas vault</h3><p class="cardsub">Ideas are allowed to just live here. No pressure to act on any of them.</p><div class="list">'
+    + (S.ideas.length ? S.ideas.map(function(x){ return rowHTML(x, { tick:false, onDelete:"delIdea" }); }).join("") : emptyHTML("Vault is empty — the next shower thought goes here."))
+    + '</div><div class="addbar"><input id="addIdea" type="text" placeholder="Capture an idea…" maxlength="120" onkeydown="if(event.key===\'Enter\')addFromInput(\'ideas\',\'addIdea\')"><button class="btn small" onclick="addFromInput(\'ideas\',\'addIdea\')">Save</button></div></div>'
+    + '</div></div>';
+  $("#view-learn").innerHTML = h;
+}
+function addBookFn(){
+  var v = $("#addBook").value.trim(); if(!v) return;
+  S.books.push({ id:uid(), title:v, status:"Want to read", progress:0 });
+  save(); render();
+}
+
+function delTrip(id){ deleteFrom("trips", id); }
+function delBooking(id){ deleteFrom("bookings", id); }
+function addTripFn(){
+  var place = $("#tripPlace").value.trim(); if(!place){ toast("Add a place"); return; }
+  var budget = parseFloat($("#tripBudget").value);
+  S.trips.push({ id:uid(), place:place, region:$("#tripRegion").value.trim() || "Somewhere", note:$("#tripNote").value.trim(), budget:isNaN(budget)?0:budget });
+  save(); render(); toast("Trip added to the dream list");
+}
+function addBookingFn(){
+  var title = $("#bkTitle").value.trim(); if(!title){ toast("Add a booking title"); return; }
+  S.bookings.push({ id:uid(), title:title, when:$("#bkWhen").value || todayStr(), detail:$("#bkDetail").value.trim() });
+  save(); render(); toast("Booking added");
+}
+function renderExplore(){
+  var h = pageHead("Explore", "Dream trips on one side, real bookings on the other. Daydreaming counts as planning here.");
+  var regions = {};
+  S.trips.forEach(function(tr){ (regions[tr.region] = regions[tr.region] || []).push(tr); });
+  h += '<div class="grid c2"><div><div class="grid" style="gap:16px">';
+  var regionNames = Object.keys(regions);
+  h += regionNames.length ? regionNames.map(function(r){
+    return '<div class="card"><h3><i data-lucide="map-pin"></i>'+esc(r)+'</h3><div class="list">'
+      + regions[r].map(function(tr){ return rowHTML(tr, { tick:false, onDelete:"delTrip", title:tr.place, meta:tr.note, right: tr.budget ? '<span class="pill">~'+money(tr.budget)+'</span>' : "" }); }).join("")
+      + '</div></div>';
+  }).join("") : '<div class="card">'+emptyHTML("No dream trips yet — add one below. Anywhere counts.")+'</div>';
+  h += '<div class="card"><h3><i data-lucide="plus"></i>Add a dream trip</h3>'
+    + '<div class="formrow"><div class="field" style="margin:0"><label>Place</label><input id="tripPlace" type="text" placeholder="City, country"></div>'
+    + '<div class="field" style="margin:0"><label>Region</label><input id="tripRegion" type="text" placeholder="e.g. Europe"></div></div>'
+    + '<div class="field" style="margin-top:10px"><label>Why this place?</label><input id="tripNote" type="text" placeholder="What would you do there?" maxlength="120"></div>'
+    + '<div class="field"><label>Rough budget ($)</label><input id="tripBudget" type="number" min="0" step="10" placeholder="0"></div>'
+    + '<button class="btn" onclick="addTripFn()"><i data-lucide="plus"></i>Add trip</button></div>';
+  h += '</div></div><div>'
+    + '<div class="card"><h3><i data-lucide="ticket"></i>Bookings &amp; tickets</h3><p class="cardsub">The real, dated stuff — so nothing sneaks up on you.</p><div class="list">'
+    + (S.bookings.length ? S.bookings.slice().sort(function(a,b){ return a.when < b.when ? -1 : 1; }).map(function(b){
+        return rowHTML(b, { tick:false, onDelete:"delBooking", title:b.title, meta:fmtDate(b.when)+(b.detail ? " · "+b.detail : "") });
+      }).join("") : emptyHTML("No bookings yet."))
+    + '</div>'
+    + '<div class="field" style="margin-top:12px"><label>Booking</label><input id="bkTitle" type="text" placeholder="e.g. Train to the coast — return"></div>'
+    + '<div class="formrow"><div class="field" style="margin:0"><label>Date</label><input id="bkWhen" type="date" value="'+todayStr()+'"></div>'
+    + '<div class="field" style="margin:0"><label>Details</label><input id="bkDetail" type="text" placeholder="Time, seat, reference…" maxlength="90"></div></div>'
+    + '<button class="btn small" style="margin-top:12px" onclick="addBookingFn()"><i data-lucide="plus"></i>Add booking</button></div>'
+    + '</div></div>';
+  $("#view-explore").innerHTML = h;
+}
+
+function delPerson(id){ deleteFrom("people", id); }
+function touchPerson(id){ var p = findById(S.people, id); if(p){ p.last = todayStr(); save(); render(); toast("Logged — you spoke to " + p.name.split(" ")[0] + " today"); } }
+function delGift(id){ deleteFrom("gifts", id); }
+function delEvent(id){ deleteFrom("events", id); }
+function addPersonFn(){
+  var name = $("#pName").value.trim(); if(!name){ toast("Add a name"); return; }
+  S.people.push({ id:uid(), name:name, detail:$("#pDetail").value.trim() || "Inner circle", last:todayStr(), note:$("#pNote").value.trim() });
+  save(); render(); toast("Added to your circle");
+}
+function daysSince(s){ return Math.round((new Date(todayStr()+"T12:00:00") - new Date(s+"T12:00:00"))/86400000); }
+function renderPeople(){
+  var h = pageHead("People", "Your inner circle, gift ideas before the panic, and the events you are hosting or heading to.");
+  h += '<div class="grid c2"><div>'
+    + '<div class="card"><h3><i data-lucide="heart-handshake"></i>Inner circle</h3><p class="cardsub">Tap the phone button when you have been in touch — gentle nudges only, never guilt.</p><div class="list">'
+    + (S.people.length ? S.people.map(function(p){
+        var d = daysSince(p.last);
+        return '<div class="row"><div class="grow"><div class="title">'+esc(p.name)+'</div><div class="meta">'+esc(p.detail)+' · last contact '+(d===0?"today":d===1?"yesterday":d+" days ago")+(p.note ? " · "+esc(p.note) : "")+'</div></div>'
+          + (d >= 7 ? '<span class="pill warn">Say hello?</span>' : '')
+          + '<button class="iconbtn" title="Log contact today" aria-label="Log contact" onclick="touchPerson(\''+p.id+'\')"><i data-lucide="phone-outgoing"></i></button>'
+          + '<button class="iconbtn" aria-label="Delete" onclick="delPerson(\''+p.id+'\')"><i data-lucide="trash-2"></i></button></div>';
+      }).join("") : emptyHTML("Your circle is empty — add the people who matter."))
+    + '</div>'
+    + '<div class="formrow" style="margin-top:12px"><div class="field" style="margin:0"><label>Name</label><input id="pName" type="text" placeholder="Name"></div>'
+    + '<div class="field" style="margin:0"><label>Relationship</label><input id="pDetail" type="text" placeholder="e.g. Sister, old friend"></div></div>'
+    + '<div class="field" style="margin-top:10px"><label>Note to remember</label><input id="pNote" type="text" placeholder="What is going on in their life?" maxlength="120"></div>'
+    + '<button class="btn small" onclick="addPersonFn()"><i data-lucide="plus"></i>Add person</button></div>'
+    + '</div><div>'
+    + '<div class="card"><h3><i data-lucide="gift"></i>Gift ideas bank</h3><p class="cardsub">Written down when you think of them — not the night before.</p><div class="list">'
+    + (S.gifts.length ? S.gifts.map(function(x){ return rowHTML(x, { tick:false, onDelete:"delGift" }); }).join("") : emptyHTML("No gift ideas banked yet."))
+    + '</div><div class="addbar"><input id="addGift" type="text" placeholder="Person — idea" maxlength="100" onkeydown="if(event.key===\'Enter\')addFromInput(\'gifts\',\'addGift\')"><button class="btn small" onclick="addFromInput(\'gifts\',\'addGift\')">Bank it</button></div></div>'
+    + '<div class="card" style="margin-top:16px"><h3><i data-lucide="party-popper"></i>Events &amp; hosting</h3><div class="list">'
+    + (S.events.length ? S.events.slice().sort(function(a,b){ return a.when < b.when ? -1 : 1; }).map(function(e){
+        return rowHTML(e, { tick:false, onDelete:"delEvent", title:e.title, meta:fmtDate(e.when)+(e.detail ? " · "+e.detail : "") });
+      }).join("") : emptyHTML("No events coming up."))
+    + '</div>'
+    + '<div class="field" style="margin-top:12px"><label>Event</label><input id="evTitle" type="text" placeholder="What is happening?"></div>'
+    + '<div class="formrow"><div class="field" style="margin:0"><label>Date</label><input id="evWhen" type="date" value="'+todayStr()+'"></div>'
+    + '<div class="field" style="margin:0"><label>Details</label><input id="evDetail" type="text" placeholder="Bringing, wearing, hosting…" maxlength="90"></div></div>'
+    + '<button class="btn small" style="margin-top:12px" onclick="addEventFn()"><i data-lucide="plus"></i>Add event</button></div>'
+    + '</div></div>';
+  $("#view-people").innerHTML = h;
+}
+function addEventFn(){
+  var title = $("#evTitle").value.trim(); if(!title){ toast("Add an event title"); return; }
+  S.events.push({ id:uid(), title:title, when:$("#evWhen").value || todayStr(), detail:$("#evDetail").value.trim() });
+  save(); render(); toast("Event added");
+}
+
+function delStream(id){ deleteFrom("incomeStreams", id); }
+function toggleHustle(id){ toggleIn("hustle", id); }
+function delHustle(id){ deleteFrom("hustle", id); }
+function addStreamFn(){
+  var name = $("#stName").value.trim(), amt = parseFloat($("#stAmt").value);
+  if(!name || isNaN(amt)){ toast("Add a stream name and amount"); return; }
+  S.incomeStreams.push({ id:uid(), name:name, amount:amt, freq:$("#stFreq").value });
+  save(); render(); toast("Income stream added");
+}
+function saveCareerNotes(){ S.cvNotes = $("#cvNotes").value; S.brandNotes = $("#brandNotes").value; save(); toast("Career notes saved"); }
+function renderCareer(){
+  var total = S.incomeStreams.reduce(function(a,s){ return a + (Number(s.amount)||0); }, 0);
+  var h = pageHead("Career", "Every income stream in one place, the side-hustle list, and the notes that keep your story straight.");
+  h += '<div class="grid c2"><div>'
+    + '<div class="card"><h3><i data-lucide="trending-up"></i>Income streams</h3><p class="cardsub">Total recorded: <strong>'+money(total)+'</strong> a month across '+S.incomeStreams.length+' streams.</p><div class="list">'
+    + (S.incomeStreams.length ? S.incomeStreams.map(function(s){
+        return rowHTML(s, { tick:false, onDelete:"delStream", title:s.name, meta:s.freq, right:'<span class="pill">'+money(s.amount)+'</span>' });
+      }).join("") : emptyHTML("No income streams recorded yet."))
+    + '</div>'
+    + '<div class="formrow" style="margin-top:12px"><div class="field" style="margin:0"><label>Stream</label><input id="stName" type="text" placeholder="e.g. Weekend tutoring"></div>'
+    + '<div class="field" style="margin:0"><label>Amount ($)</label><input id="stAmt" type="number" step="0.01" min="0" placeholder="0.00"></div></div>'
+    + '<div class="field" style="margin-top:10px"><label>Frequency</label><select id="stFreq"><option>Monthly</option><option>Weekly</option><option>One-off</option><option>Yearly</option></select></div>'
+    + '<button class="btn small" onclick="addStreamFn()"><i data-lucide="plus"></i>Add stream</button></div>'
+    + '<div class="card" style="margin-top:16px"><h3><i data-lucide="rocket"></i>Side-hustle tasks</h3><div class="list">'
+    + (S.hustle.length ? S.hustle.map(function(x){ return rowHTML(x, { onToggle:"toggleHustle", onDelete:"delHustle" }); }).join("") : emptyHTML("No hustle tasks right now. Rest is also a strategy."))
+    + '</div><div class="addbar"><input id="addHustle" type="text" placeholder="Next small step…" maxlength="90" onkeydown="if(event.key===\'Enter\')addFromInput(\'hustle\',\'addHustle\',{done:false})"><button class="btn small" onclick="addFromInput(\'hustle\',\'addHustle\',{done:false})">Add</button></div></div>'
+    + '</div><div>'
+    + '<div class="card"><h3><i data-lucide="file-text"></i>CV notes</h3><p class="cardsub">What to add, fix or brag about — ready for the next update.</p>'
+    + '<div class="field"><textarea id="cvNotes" placeholder="Notes for your CV…">'+esc(S.cvNotes)+'</textarea></div>'
+    + '<h3 style="margin-top:16px"><i data-lucide="megaphone"></i>Personal brand notes</h3>'
+    + '<div class="field"><textarea id="brandNotes" placeholder="Your positioning, posting rhythm, promises to yourself…">'+esc(S.brandNotes)+'</textarea></div>'
+    + '<button class="btn" onclick="saveCareerNotes()">Save notes</button></div>'
+    + '</div></div>';
+  $("#view-career").innerHTML = h;
+}
+
+function delInv(id){ deleteFrom("inventory", id); }
+function addInvFn(){
+  var item = $("#invItem").value.trim(); if(!item){ toast("Add an item name"); return; }
+  S.inventory.push({ id:uid(), item:item, place:$("#invPlace").value.trim(), qty:$("#invQty").value.trim() || "1" });
+  save(); render(); toast("Added to the home inventory");
+}
+function saveEmergency(){ S.emergency.contacts = $("#emContacts").value; S.emergency.documents = $("#emDocs").value; S.emergency.medical = $("#emMedical").value; save(); toast("Emergency info saved"); }
+function renderHousehold(){
+  var h = pageHead("Household", "Where things live, and the information future-you will be grateful for in an emergency.");
+  h += '<div class="grid c2"><div>'
+    + '<div class="card"><h3><i data-lucide="package-search"></i>Home inventory</h3><p class="cardsub">“Where is the…?” — answered before it is asked.</p><div class="list">'
+    + (S.inventory.length ? S.inventory.map(function(x){
+        return rowHTML(x, { tick:false, onDelete:"delInv", title:x.item, meta:x.place, right:'<span class="pill">× '+esc(x.qty)+'</span>' });
+      }).join("") : emptyHTML("Inventory is empty."))
+    + '</div>'
+    + '<div class="formrow" style="margin-top:12px"><div class="field" style="margin:0"><label>Item</label><input id="invItem" type="text" placeholder="Item name"></div>'
+    + '<div class="field" style="margin:0"><label>Where it lives</label><input id="invPlace" type="text" placeholder="Room, shelf, box…"></div></div>'
+    + '<div class="field" style="margin-top:10px"><label>Quantity</label><input id="invQty" type="text" value="1" maxlength="6"></div>'
+    + '<button class="btn small" onclick="addInvFn()"><i data-lucide="plus"></i>Add item</button></div>'
+    + '</div><div>'
+    + '<div class="card"><h3><i data-lucide="siren"></i>Emergency information</h3><p class="cardsub">Kept in this browser, on this device. Write it like a note to a trusted person.</p>'
+    + '<div class="field"><label>Key contacts</label><textarea id="emContacts" placeholder="Who to call, in what order…">'+esc(S.emergency.contacts)+'</textarea></div>'
+    + '<div class="field"><label>Documents — where they are</label><textarea id="emDocs" placeholder="Passports, insurance, tenancy, wills…">'+esc(S.emergency.documents)+'</textarea></div>'
+    + '<div class="field"><label>Medical essentials</label><textarea id="emMedical" placeholder="Allergies, GP, blood type, regular medication…">'+esc(S.emergency.medical)+'</textarea></div>'
+    + '<button class="btn" onclick="saveEmergency()">Save emergency info</button></div>'
+    + '</div></div>';
+  $("#view-household").innerHTML = h;
+}
+
+/* ================= Mind ================= */
+function addGratitudeFn(){
+  var v = $("#addGrat").value.trim(); if(!v) return;
+  S.gratitude.unshift({ id:uid(), date:todayStr(), text:v });
+  save(); render(); toast("Into the jar it goes");
+}
+function delGratitude(id){ deleteFrom("gratitude", id); }
+function addJournalFn(){
+  var v = $("#journalText").value.trim(); if(!v){ toast("Write a line or two first"); return; }
+  S.journal.unshift({ id:uid(), date:todayStr(), text:v });
+  save(); render(); toast("Journal entry saved");
+}
+function delJournal(id){ deleteFrom("journal", id); }
+function sealLetter(){
+  var v = $("#letterText").value.trim(); if(!v){ toast("Write the letter first"); return; }
+  S.letter = { text:v, openDate:$("#letterDate").value || addDaysStr(todayStr(), 90), sealed:true };
+  save(); render(); toast("Letter sealed until " + fmtDate(S.letter.openDate));
+}
+function openLetter(){ S.letter.sealed = false; save(); render(); }
+function renderMind(){
+  var dayIdx = Math.floor(new Date(todayStr()+"T12:00:00").getTime()/86400000) % AFFIRMATIONS.length;
+  var canOpen = S.letter.sealed && S.letter.openDate && todayStr() >= S.letter.openDate;
+  var h = pageHead("Mind", "Affirmations, a gratitude jar that fills up visibly, a journal with no streaks to break, and one sealed letter.");
+  h += '<div class="grid c2"><div>'
+    + '<div class="card"><h3><i data-lucide="sun"></i>Affirmation of the day</h3>'
+    + '<p style="font-family:var(--font-display);font-size:1.25rem;line-height:1.5">“'+esc(AFFIRMATIONS[dayIdx])+'”</p>'
+    + '<p class="small muted" style="margin-top:10px">A new one arrives each morning. Say it out loud if you can — it lands differently.</p></div>'
+    + '<div class="card" style="margin-top:16px"><h3><i data-lucide="mail"></i>A letter to future you</h3>';
+  if(S.letter.sealed && !canOpen){
+    h += '<p class="cardsub">Sealed. It opens on <strong>'+fmtDate(S.letter.openDate)+'</strong>. What is inside stays inside until then — that is the whole point.</p>'
+      + '<div class="alert" style="background:var(--accent-soft);border-color:var(--line2);color:var(--ink2)"><i data-lucide="lock"></i><div>This letter is sealed. Past you is trusting future you to wait.</div></div></div>';
+  } else if(S.letter.sealed && canOpen){
+    h += '<p class="cardsub">The date has arrived — your letter is ready.</p>'
+      + '<button class="btn" onclick="openLetter()"><i data-lucide="mail-open"></i>Open the letter</button></div>';
+  } else {
+    h += '<p class="cardsub">Write to yourself, pick a date, seal it. It will wait quietly.</p>'
+      + (S.letter.text ? '<p style="font-family:var(--font-display);font-size:1.08rem;line-height:1.55;margin-bottom:12px">“'+esc(S.letter.text)+'”</p>' : '')
+      + '<div class="field"><label>Your letter</label><textarea id="letterText" placeholder="Dear future me…">'+esc(S.letter.sealed ? "" : S.letter.text)+'</textarea></div>'
+      + '<div class="field"><label>Open on</label><input id="letterDate" type="date" value="'+(S.letter.openDate || addDaysStr(todayStr(), 90))+'"></div>'
+      + '<button class="btn" onclick="sealLetter()"><i data-lucide="lock"></i>Seal the letter</button></div>';
+  }
+  h += '</div><div>'
+    + '<div class="card"><h3><i data-lucide="heart"></i>Gratitude jar</h3><p class="cardsub">'+S.gratitude.length+' good thing'+(S.gratitude.length===1?"":"s")+' saved. On a flat day, read three at random.</p><div class="list">'
+    + (S.gratitude.length ? S.gratitude.slice(0,8).map(function(g){
+        return rowHTML(g, { tick:false, onDelete:"delGratitude", title:g.text, meta:fmtDate(g.date) });
+      }).join("") : emptyHTML("The jar is empty — one small good thing will start it."))
+    + '</div><div class="addbar"><input id="addGrat" type="text" placeholder="One good thing from today…" maxlength="120" onkeydown="if(event.key===\'Enter\')addGratitudeFn()"><button class="btn small" onclick="addGratitudeFn()">Add</button></div></div>'
+    + '<div class="card" style="margin-top:16px"><h3><i data-lucide="notebook-pen"></i>Journal</h3><p class="cardsub">No streaks, no word counts. Just today, in your own words.</p>'
+    + '<div class="field"><textarea id="journalText" placeholder="Dear diary is optional. Start anywhere…"></textarea></div>'
+    + '<button class="btn small" onclick="addJournalFn()"><i data-lucide="plus"></i>Save entry</button>'
+    + '<div class="list" style="margin-top:8px">'
+    + (S.journal.length ? S.journal.slice(0,5).map(function(j){
+        return rowHTML(j, { tick:false, onDelete:"delJournal", title:j.text, meta:fmtDate(j.date) });
+      }).join("") : emptyHTML("No entries yet."))
+    + '</div></div>'
+    + '</div></div>';
+  $("#view-mind").innerHTML = h;
+}
+
+/* ================= Wellness ================= */
+function toggleMorning(id){ toggleIn("morning", id); }
+function toggleEvening(id){ toggleIn("evening", id); }
+function delMorning(id){ deleteFrom("morning", id); }
+function delEvening(id){ deleteFrom("evening", id); }
+function toggleGrocery(id){ toggleIn("groceries", id); }
+function delGrocery(id){ deleteFrom("groceries", id); }
+function recipeToGrocery(id){
+  var r = findById(S.recipes, id); if(!r) return;
+  r.ingredients.forEach(function(ing){ S.groceries.push({ id:uid(), text:ing + " (" + r.name + ")", done:false }); });
+  save(); render(); toast("Ingredients added to the grocery list");
+}
+function delRecipe(id){ deleteFrom("recipes", id); }
+function addRecipeFn(){
+  var name = $("#recName").value.trim(); if(!name){ toast("Add a recipe name"); return; }
+  var ings = $("#recIngs").value.split(",").map(function(x){ return x.trim(); }).filter(Boolean);
+  S.recipes.push({ id:uid(), name:name, time:$("#recTime").value.trim() || "—", ingredients:ings });
+  save(); render(); toast("Recipe saved");
+}
+function delMed(id){ deleteFrom("meds", id); }
+function refillMed(id){ var m = findById(S.meds, id); if(m){ m.supply = 30; save(); render(); toast(m.name + " marked as refilled (30 days)"); } }
+function addMedFn(){
+  var name = $("#medName").value.trim(); if(!name){ toast("Add a medication name"); return; }
+  var sup = parseInt($("#medSupply").value, 10);
+  S.meds.push({ id:uid(), name:name, dose:$("#medDose").value.trim(), supply:isNaN(sup)?0:sup });
+  save(); render(); toast("Medication added");
+}
+function delFitness(id){ deleteFrom("fitness", id); }
+function addFitnessFn(){
+  var text = $("#fitText").value.trim(); if(!text){ toast("Describe the session"); return; }
+  S.fitness.unshift({ id:uid(), date:$("#fitDate").value || todayStr(), text:text, detail:$("#fitDetail").value.trim() });
+  save(); render(); toast("Session logged");
+}
+function routineCard(title, icon, arr, toggleFn, delFn, inputId, addArg){
+  return '<div class="card"><h3><i data-lucide="'+icon+'"></i>'+title+'</h3><div class="list">'
+    + (arr.length ? arr.map(function(x){ return rowHTML(x, { onToggle:toggleFn, onDelete:delFn }); }).join("") : emptyHTML("Nothing here yet."))
+    + '</div><div class="addbar"><input id="'+inputId+'" type="text" placeholder="Add a step…" maxlength="80" onkeydown="if(event.key===\'Enter\')addFromInput(\''+addArg+'\',\''+inputId+'\',{done:false})"><button class="btn small" onclick="addFromInput(\''+addArg+'\',\''+inputId+'\',{done:false})">Add</button></div></div>';
+}
+function renderWellness(){
+  var alerts = medAlerts();
+  var h = pageHead("Wellness", "Routines that bookend the day, recipes that write their own shopping list, medication that reminds you before it runs out.");
+  if(alerts.length){
+    h += '<div class="alert" style="margin-bottom:16px"><i data-lucide="pill"></i><div><strong>Refill reminder:</strong> '
+      + alerts.map(function(m){ return esc(m.name)+" has about "+m.supply+" days left"; }).join("; ")
+      + '. Order or collect the refill this week.</div></div>';
+  }
+  h += '<div class="grid c2"><div class="grid" style="gap:16px;align-content:start">'
+    + routineCard("Morning routine", "sunrise", S.morning, "toggleMorning", "delMorning", "addMorning", "morning")
+    + routineCard("Evening routine", "moon-star", S.evening, "toggleEvening", "delEvening", "addEvening", "evening")
+    + '<div class="card"><h3><i data-lucide="activity"></i>Fitness log</h3><div class="list">'
+    + (S.fitness.length ? S.fitness.slice(0,6).map(function(f){
+        return rowHTML(f, { tick:false, onDelete:"delFitness", title:f.text, meta:fmtDate(f.date)+(f.detail ? " · "+f.detail : "") });
+      }).join("") : emptyHTML("No sessions logged yet — a ten-minute walk counts."))
+    + '</div>'
+    + '<div class="formrow" style="margin-top:12px"><div class="field" style="margin:0"><label>Session</label><input id="fitText" type="text" placeholder="Walk, run, yoga, swim…"></div>'
+    + '<div class="field" style="margin:0"><label>Date</label><input id="fitDate" type="date" value="'+todayStr()+'"></div></div>'
+    + '<div class="field" style="margin-top:10px"><label>Detail</label><input id="fitDetail" type="text" placeholder="Duration, distance, how it felt" maxlength="60"></div>'
+    + '<button class="btn small" onclick="addFitnessFn()"><i data-lucide="plus"></i>Log session</button></div>'
+    + '</div><div class="grid" style="gap:16px;align-content:start">'
+    + '<div class="card"><h3><i data-lucide="chef-hat"></i>Recipes</h3><p class="cardsub">One tap sends a recipe\u2019s ingredients to the grocery list.</p><div class="grid" style="gap:12px">'
+    + (S.recipes.length ? S.recipes.map(function(r){
+        return '<div style="border:1px solid var(--line);border-radius:12px;padding:13px 14px;background:var(--bg)"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><strong>'+esc(r.name)+'</strong><span class="pill">'+esc(r.time)+'</span></div>'
+          + '<p class="small muted" style="margin:5px 0 10px">'+esc(r.ingredients.join(" · "))+'</p>'
+          + '<div style="display:flex;gap:8px"><button class="btn small" onclick="recipeToGrocery(\''+r.id+'\')"><i data-lucide="shopping-basket"></i>To grocery list</button>'
+          + '<button class="btn ghost small" onclick="delRecipe(\''+r.id+'\')">Delete</button></div></div>';
+      }).join("") : emptyHTML("No recipes yet."))
+    + '</div>'
+    + '<div class="formrow" style="margin-top:14px"><div class="field" style="margin:0"><label>Recipe name</label><input id="recName" type="text" placeholder="e.g. Veggie curry"></div>'
+    + '<div class="field" style="margin:0"><label>Time</label><input id="recTime" type="text" placeholder="e.g. 30 min" maxlength="12"></div></div>'
+    + '<div class="field" style="margin-top:10px"><label>Ingredients (comma separated)</label><input id="recIngs" type="text" placeholder="Rice, coconut milk, curry paste…"></div>'
+    + '<button class="btn small" onclick="addRecipeFn()"><i data-lucide="plus"></i>Add recipe</button></div>'
+    + '<div class="card"><h3><i data-lucide="shopping-basket"></i>Grocery list</h3><div class="list">'
+    + (S.groceries.length ? S.groceries.map(function(x){ return rowHTML(x, { onToggle:"toggleGrocery", onDelete:"delGrocery" }); }).join("") : emptyHTML("List is empty — send a recipe over, or add items below."))
+    + '</div><div class="addbar"><input id="addGrocery" type="text" placeholder="Add an item…" maxlength="80" onkeydown="if(event.key===\'Enter\')addFromInput(\'groceries\',\'addGrocery\',{done:false})"><button class="btn small" onclick="addFromInput(\'groceries\',\'addGrocery\',{done:false})">Add</button></div></div>'
+    + '<div class="card"><h3><i data-lucide="pill"></i>Medication &amp; refills</h3><p class="cardsub">Anything at 7 days or less raises the refill reminder.</p><div class="list">'
+    + (S.meds.length ? S.meds.map(function(m){
+        var low = (Number(m.supply)||0) <= 7;
+        return '<div class="row"><div class="grow"><div class="title">'+esc(m.name)+'</div><div class="meta">'+esc(m.dose)+'</div></div>'
+          + '<span class="pill'+(low?' bad':'')+'">'+m.supply+' days left</span>'
+          + '<button class="iconbtn" title="Mark refilled" aria-label="Mark refilled" onclick="refillMed(\''+m.id+'\')"><i data-lucide="refresh-ccw"></i></button>'
+          + '<button class="iconbtn" aria-label="Delete" onclick="delMed(\''+m.id+'\')"><i data-lucide="trash-2"></i></button></div>';
+      }).join("") : emptyHTML("No medication tracked."))
+    + '</div>'
+    + '<div class="formrow" style="margin-top:12px"><div class="field" style="margin:0"><label>Name</label><input id="medName" type="text" placeholder="Medication"></div>'
+    + '<div class="field" style="margin:0"><label>Days of supply left</label><input id="medSupply" type="number" min="0" value="30"></div></div>'
+    + '<div class="field" style="margin-top:10px"><label>Dose</label><input id="medDose" type="text" placeholder="e.g. 1 tablet at night" maxlength="60"></div>'
+    + '<button class="btn small" onclick="addMedFn()"><i data-lucide="plus"></i>Add medication</button></div>'
+    + '</div></div>';
+  $("#view-wellness").innerHTML = h;
+}
+
+/* ================= Settings ================= */
+var THEMES = [ ["cocoa","#A5502A","Cocoa"], ["sage","#67793F","Sage"], ["apricot","#C0731F","Apricot"], ["lavender","#7563A6","Lavender"], ["ocean","#38626F","Ocean"], ["rosewood","#9C4353","Rosewood"] ];
+var BRIGHT_PRESETS = [ ["Dim",80], ["Soft",90], ["Comfort",100], ["Bright",112] ];
+function switchHTML(on, fn){ return '<button class="switch'+(on?' on':'')+'" role="switch" aria-checked="'+on+'" onclick="'+fn+'"></button>'; }
+function renderSettings(){
+  var st = S.settings;
+  var h = pageHead("Settings", "One colour theme across the whole planner, light that suits your eyes, and modes for hard days.");
+  h += '<div class="grid c2"><div class="grid" style="gap:16px;align-content:start">'
+    + '<div class="card"><h3><i data-lucide="palette"></i>Colour theme</h3><p class="cardsub">One theme, everywhere — hubs, charts, buttons and highlights all follow it.</p><div class="swatches">'
+    + THEMES.map(function(t){ return '<button class="swatch'+(st.theme===t[0]?' on':'')+'" onclick="setSetting(\'theme\',\''+t[0]+'\')"><span class="dot" style="background:'+t[1]+'"></span><span class="nm">'+t[2]+'</span></button>'; }).join("")
+    + '</div>'
+    + '<div class="setrow"><div class="grow"><div class="t">Appearance</div><div class="d">Light, dark — or follow your device. Dark here is a deep warm brown, never black.</div></div>'
+    + '<div class="seg"><button class="'+(st.mode==='light'?'on':'')+'" onclick="setSetting(\'mode\',\'light\')">Light</button><button class="'+(st.mode==='dark'?'on':'')+'" onclick="setSetting(\'mode\',\'dark\')">Dark</button><button class="'+(st.mode==='system'?'on':'')+'" onclick="setSetting(\'mode\',\'system\')">Device</button></div></div>'
+    + '</div>'
+    + '<div class="card"><h3><i data-lucide="sun-medium"></i>Screen brightness</h3><p class="cardsub">Softens or lifts the whole planner — separate from your device brightness.</p>'
+    + '<div class="timermodes" style="justify-content:flex-start;margin-bottom:14px">'
+    + BRIGHT_PRESETS.map(function(p){ return '<button class="btn '+(st.brightness===p[1]?'':'ghost')+' small" onclick="setSetting(\'brightness\','+p[1]+')">'+p[0]+'</button>'; }).join("")
+    + '</div>'
+    + '<div style="display:flex;align-items:center;gap:12px"><input type="range" min="70" max="120" step="1" value="'+st.brightness+'" oninput="setSetting(\'brightness\',Number(this.value))" aria-label="Brightness"><strong>'+st.brightness+'%</strong></div></div>'
+    + '<div class="card"><h3><i data-lucide="accessibility"></i>Reading comfort</h3>'
+    + '<div class="setrow"><div class="grow"><div class="t">Text size</div><div class="d">Applies everywhere, straight away.</div></div>'
+    + '<div class="seg"><button class="'+(st.textSize==='small'?'on':'')+'" onclick="setSetting(\'textSize\',\'small\')">Small</button><button class="'+(st.textSize==='medium'?'on':'')+'" onclick="setSetting(\'textSize\',\'medium\')">Medium</button><button class="'+(st.textSize==='large'?'on':'')+'" onclick="setSetting(\'textSize\',\'large\')">Large</button></div></div>'
+    + '<div class="setrow"><div class="grow"><div class="t">Easy-read font</div><div class="d">Atkinson Hyperlegible — letterforms designed to be told apart at a glance.</div></div>'
+    + switchHTML(st.easyRead, "setSetting('easyRead',"+(!st.easyRead)+")") + '</div>'
+    + '<div class="setrow"><div class="grow"><div class="t">Your name</div><div class="d">Used in the Home greeting.</div></div>'
+    + '<input type="text" value="'+esc(st.name)+'" maxlength="24" style="width:130px;background:var(--bg);border:1px solid var(--line2);border-radius:10px;padding:8px 10px" onchange="setSetting(\'name\',this.value.trim()||\'Friend\')"></div>'
+    + '</div>'
+    + '</div><div class="grid" style="gap:16px;align-content:start">'
+    + '<div class="card"><h3><i data-lucide="heart-pulse"></i>Gentle modes</h3><p class="cardsub">For the days when the full planner is too much planner.</p>'
+    + '<div class="setrow"><div class="grow"><div class="t">Foggy-day mode</div><div class="d">Home shrinks to mood, Top Three and Brain Dump. Everything else waits quietly in its hub.</div></div>'
+    + switchHTML(st.foggy, "setSetting('foggy',"+(!st.foggy)+")") + '</div>'
+    + '<div class="setrow"><div class="grow"><div class="t">Calm mode</div><div class="d">No animations, no movement. The page holds still.</div></div>'
+    + switchHTML(st.calm, "setSetting('calm',"+(!st.calm)+")") + '</div>'
+    + '<div class="setrow"><div class="grow"><div class="t">Low-battery mode</div><div class="d">Strips shadows and motion to sip power on a dying battery.</div></div>'
+    + switchHTML(st.lowBattery, "setSetting('lowBattery',"+(!st.lowBattery)+")") + '</div>'
+    + '</div>'
+    + '<div class="card"><h3><i data-lucide="database"></i>Your data</h3><p class="cardsub">Saved in this browser, on this device only — nothing is sent anywhere. Back it up before switching browsers or clearing site data.</p>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    + '<button class="btn ghost" onclick="exportData()"><i data-lucide="download"></i>Export backup</button>'
+    + '<label class="btn ghost" style="cursor:pointer"><i data-lucide="upload"></i>Import backup<input type="file" accept="application/json" style="display:none" onchange="importData(this)"></label></div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
+    + (S.sample ? '<button class="btn ghost" onclick="clearSample()">Clear sample data</button>' : '<button class="btn ghost" onclick="loadSample()">Load sample data</button>')
+    + '<button class="btn danger" onclick="wipeData()"><i data-lucide="trash-2"></i>Erase everything</button></div>'
+    + '</div>'
+    + '</div></div>';
+  $("#view-settings").innerHTML = h;
+}
+function exportData(){
+  var blob = new Blob([JSON.stringify(S, null, 2)], { type:"application/json" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "calm-life-planner-backup.json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+  toast("Backup downloaded");
+}
+function importData(input){
+  var file = input.files && input.files[0]; if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    try{
+      var data = JSON.parse(reader.result);
+      if(!data || !data.settings) throw new Error("bad");
+      S = data; save(); applySettings(); render(); toast("Backup imported");
+    }catch(e){ toast("That file does not look like a Calm Life Planner backup"); }
+  };
+  reader.readAsText(file);
+}
+function wipeData(){
+  var keep = S.settings; S = blankState(); S.settings = keep; S.sample = false; save(); render();
+  toast("Everything erased — a clean planner");
+}
+
+/* ================= Render root ================= */
+function render(){
+  renderSample();
+  renderHome(); renderPlan(); renderMoney(); renderGoals(); renderLearn();
+  renderExplore(); renderPeople(); renderCareer(); renderHousehold(); renderMind(); renderWellness(); renderSettings();
+  var hubsSlot = $("#sideHubs");
+  var alerts = medAlerts().length;
+  hubsSlot.innerHTML = HUBS.map(function(hb){
+    return '<button class="navitem" data-nav="'+hb.id+'"><i data-lucide="'+hb.icon+'"></i>'+hb.name
+      + (hb.id === "wellness" && alerts ? '<span class="badge">'+alerts+'</span>' : '') + '</button>';
+  }).join("");
+  $$("#sideHubs [data-nav]").forEach(function(b){
+    b.addEventListener("click", function(){ go(b.getAttribute("data-nav")); });
+    b.classList.toggle("active", b.getAttribute("data-nav") === ui.view);
+  });
+  $$(".sidebar > [data-nav], .bottomnav [data-nav]").forEach(function(b){
+    b.classList.toggle("active", b.getAttribute("data-nav") === ui.view);
+  });
+  icons();
+}
+function init(){
+  $("#brandDate").textContent = new Date().toLocaleDateString(undefined, { weekday:"long", month:"long", day:"numeric" });
+  applySettings();
+  render();
+  go("home");
+  if(window.matchMedia){
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function(){ applySettings(); });
+  }
+}
+init();
+
+function toggleSound(kind){
+  if(ui.soundOn === kind){ stopSound(); ui.soundOn = null; render(); return; }
+  stopSound();
+  var ctx = ensureAudio(); if(!ctx){ toast("Audio is not available in this browser"); return; }
+  ui.soundOn = kind;
+  if(kind === "bells"){
+    var strike = function(){
+      if(!AC) return;
+      var o = AC.createOscillator(), g = AC.createGain();
+      o.type = "sine"; o.frequency.value = [523.25, 659.25, 783.99][Math.floor(Math.random()*3)];
+      g.gain.setValueAtTime(0.0001, AC.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.14, AC.currentTime + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime + 2.6);
+      o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime + 2.7);
+    };
+    strike(); bellInt = setInterval(strike, 4200);
+  } else {
+    var len = 2 * ctx.sampleRate, buf = ctx.createBuffer(1, len, ctx.sampleRate), data = buf.getChannelData(0), last = 0;
+    for(var i=0;i<len;i++){
+      var white = Math.random()*2-1;
+      if(kind === "rain"){ data[i] = white * 0.32; }
+      else { last = (last + 0.02*white)/1.02; data[i] = last * 3.2; }
+    }
+    var src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+    var filt = ctx.createBiquadFilter(); filt.type = "lowpass"; filt.frequency.value = kind === "rain" ? 1400 : 420;
+    var g = ctx.createGain(); g.gain.value = kind === "rain" ? 0.16 : 0.5;
+    src.connect(filt); filt.connect(g); g.connect(ctx.destination); src.start();
+    soundNodes = { src: src, gain: g };
+  }
+  render();
+}
+</script>
+</body>
+</html>
